@@ -1,0 +1,21 @@
+﻿  FeatureDetector.cpp
+c:\users\masa\documents\visual studio 2010\projects\flowers\featuredetector.cpp(85): warning C4018: '<' : signed/unsigned mismatch
+c:\users\masa\documents\visual studio 2010\projects\flowers\featuredetector.cpp(98): warning C4018: '<' : signed/unsigned mismatch
+c:\users\masa\documents\visual studio 2010\projects\flowers\featuredetector.cpp(100): warning C4018: '<' : signed/unsigned mismatch
+c:\users\masa\documents\visual studio 2010\projects\flowers\featuredetector.cpp(170): warning C4018: '<' : signed/unsigned mismatch
+c:\users\masa\documents\visual studio 2010\projects\flowers\featuredetector.cpp(172): warning C4018: '<' : signed/unsigned mismatch
+c:\users\masa\documents\visual studio 2010\projects\flowers\featuredetector.cpp(187): warning C4018: '<' : signed/unsigned mismatch
+c:\users\masa\documents\visual studio 2010\projects\flowers\featuredetector.cpp(189): warning C4018: '<' : signed/unsigned mismatch
+c:\users\masa\documents\visual studio 2010\projects\flowers\featuredetector.cpp(218): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
+c:\users\masa\documents\visual studio 2010\projects\flowers\featuredetector.cpp(238): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
+c:\users\masa\documents\visual studio 2010\projects\flowers\featuredetector.cpp(261): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
+c:\users\masa\documents\visual studio 2010\projects\flowers\featuredetector.cpp(281): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
+c:\users\masa\documents\visual studio 2010\projects\flowers\featuredetector.cpp(289): warning C4018: '<' : signed/unsigned mismatch
+c:\users\masa\documents\visual studio 2010\projects\flowers\featuredetector.cpp(311): warning C4018: '<' : signed/unsigned mismatch
+c:\users\masa\documents\visual studio 2010\projects\flowers\featuredetector.cpp(317): warning C4018: '<' : signed/unsigned mismatch
+c:\users\masa\documents\visual studio 2010\projects\flowers\featuredetector.cpp(319): warning C4018: '<' : signed/unsigned mismatch
+c:\users\masa\documents\visual studio 2010\projects\flowers\featuredetector.cpp(353): warning C4244: '=' : conversion from 'double' to 'int', possible loss of data
+c:\users\masa\documents\visual studio 2010\projects\flowers\featuredetector.cpp(354): warning C4244: '=' : conversion from 'double' to 'int', possible loss of data
+c:\users\masa\documents\visual studio 2010\projects\flowers\featuredetector.cpp(361): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
+  LINK : C:\Users\Masa\Documents\Visual Studio 2010\Projects\flowers\Debug\flowers.exe not found or not built by the last incremental link; performing full link
+  flowers.vcxproj -> C:\Users\Masa\Documents\Visual Studio 2010\Projects\flowers\Debug\flowers.exe
