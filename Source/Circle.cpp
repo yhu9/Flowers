@@ -5,7 +5,7 @@ Circle::Circle(void)
 {
 }
 
-Circle::Circle(cv::Point centerIn, double radiusIn)
+Circle::Circle(Point centerIn, double radiusIn)
 {
 	center = centerIn;
 	radius = radiusIn;
@@ -23,16 +23,16 @@ void Circle::createPoints()
 	for(int i = 0; i <= 360; i++)
 	{
 		double rad = (double)i/180 * 3.1415926;
-		int x = center.x + radius * std::cos(rad);
-		int y = center.y + radius * std::sin(rad);
-		cv::Point newpt = cv::Point(x,y);
+		int x = center.x + radius * cos(rad);
+		int y = center.y + radius * sin(rad);
+		Point newpt = Point(x,y);
 		cPoints.push_back(newpt);
 	}
 }
 /*
-cv::Point Circle::findPoint(cv::Vec2i ray)
+Point Circle::findPoint(Vec2i ray)
 {
-	cv::Point nextPt;
+	Point nextPt;
 	double slope1 = (double)ray[1]/ray[0];
 	for(unsigned i = 0; i < cPoints.size(); i++)
 	{
@@ -55,7 +55,7 @@ cv::Point Circle::findPoint(cv::Vec2i ray)
 				
 			}
 			else
-				std::cout << "unhandled error" << std::endl;
+				cout << "unhandled error" << endl;
 		}
 	}
 

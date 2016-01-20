@@ -1,19 +1,23 @@
 #pragma once
 #include <iostream>
 #include <fstream>
-#include <opencv2/opencv.hpp>
+#include "opencv2/core.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/imgproc.hpp"
 #include <stdlib.h>
 
+using namespace std;
+using namespace cv;
 class Node
 {
 public:
 	Node(void);
-	Node(cv::Point);
+	Node(Point);
 	~Node(void);
 
-	cv::Point pt;
+	Point pt;
 	
-	std::vector<Node*> edge;
+	vector<Node*> edge;
 	int prev;
 	int dist;
 	int* id;

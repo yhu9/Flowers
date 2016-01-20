@@ -3,14 +3,18 @@
 MyTools::MyTools(){}
 MyTools::~MyTools(){}
 
+using namespace cv;
+using namespace std;
 //Some useful trigonometry and geometry tools
-cv::Point MyTools::findClosestPoint(int x, int y, std::vector<cv::Point> contour)
+
+Point MyTools::findClosestPoint(int x, int y, vector<Point> contour)
 {
+	cout << "MyTools::findClosestPoint" << endl;
 	double smallestDistance = -1, tmp = 0;
-	cv::Point closestPoint;
+	Point closestPoint;
 	for(unsigned i = 0; i < contour.size(); i++)
 	{
-		tmp = std::sqrt(std::pow((double)(contour[i].x - x),2) + std::pow((double)(contour[i].y - y),2));
+		tmp = sqrt(pow((double)(contour[i].x - x),2) + pow((double)(contour[i].y - y),2));
 		if(tmp < smallestDistance || smallestDistance == -1)
 		{
 			smallestDistance = tmp;
@@ -20,13 +24,14 @@ cv::Point MyTools::findClosestPoint(int x, int y, std::vector<cv::Point> contour
 	return closestPoint;
 }
 
-cv::Point MyTools::findClosestPoint(cv::Point center, std::vector<Node> contour)
+Point MyTools::findClosestPoint(Point center, vector<Node> contour)
 {
+	cout << "MyTools::findClosestPoint" << endl;
 	double smallestDistance = -1, tmp = 0;
-	cv::Point closestPoint;
+	Point closestPoint;
 	for(unsigned i = 0; i < contour.size(); i++)
 	{
-		tmp = std::sqrt(std::pow((double)(contour[i].pt.x - center.x),2) + std::pow((double)(contour[i].pt.y - center.y),2));
+		tmp = sqrt(pow((double)(contour[i].pt.x - center.x),2) + pow((double)(contour[i].pt.y - center.y),2));
 		if(tmp < smallestDistance || smallestDistance == -1)
 		{
 			smallestDistance = tmp;
@@ -35,13 +40,14 @@ cv::Point MyTools::findClosestPoint(cv::Point center, std::vector<Node> contour)
 	}
 	return closestPoint;
 }
-int MyTools::findClosestPoint(cv::Point point, std::vector<cv::Point> contour)
+int MyTools::findClosestPoint(Point point, vector<Point> contour)
 {
+	cout << "MyTools::findClosestPoint" << endl;
 	double smallestDistance = -1, tmp = 0;
 	int closestPoint = -1;
 	for(unsigned i = 0; i < contour.size(); i++)
 	{
-		tmp = std::sqrt(std::pow((double)(contour[i].x - point.x),2) + std::pow((double)(contour[i].y - point.y),2));
+		tmp = sqrt(pow((double)(contour[i].x - point.x),2) + pow((double)(contour[i].y - point.y),2));
 		if(tmp < smallestDistance || smallestDistance == -1)
 		{
 			smallestDistance = tmp;
@@ -50,57 +56,64 @@ int MyTools::findClosestPoint(cv::Point point, std::vector<cv::Point> contour)
 	}
 	return closestPoint;
 }
-cv::Point MyTools::findMidPoint(cv::Point v1, cv::Point v2)
+Point MyTools::findMidPoint(Point v1, Point v2)
 {
-	cv::Point midPoint;
+	cout << "MyTools::findMidPoint" << endl;
+	Point midPoint;
 	double x,y;
 	x = (v1.x + v2.x)/2;
 	y = (v1.y + v2.y)/2;
-	midPoint = cv::Point(x,y);
+	midPoint = Point(x,y);
 	return midPoint;
 }
-void MyTools::outlineContour(std::vector<std::vector<cv::Point>> contour, cv::Mat img)
+void MyTools::outlineContour(vector<vector<Point> > contour, Mat img)
 {
-	cv::Point prev = contour[0][0];
+	cout << "MyTools::outlineContour" << endl;
+	Point prev = contour[0][0];
 	for(unsigned i = 0; i < contour.size(); i++)
 	{
 		for(unsigned j = 1; j < contour[i].size() - 1; j++)
 		{
-			cv::line(img,prev,contour[i][j],cv::Scalar(255,255,255),2,8);
-			prev = cv::Point(contour[i][j].x,contour[i][j].y);
+			line(img,prev,contour[i][j],Scalar(255,255,255),2,8);
+			prev = Point(contour[i][j].x,contour[i][j].y);
 		}
 	}
 }
-double MyTools::findDistance(cv::Point v1, cv::Point v2)
+double MyTools::findDistance(Point v1, Point v2)
 {
+	cout << "MyTools::findDistance" << endl;
 	double distance = -1;
 
 	distance = sqrt(pow((double)(v2.x - v1.x), 2) + pow((double)v2.y - (double)v1.y,2));
 	return distance;
 }
-double MyTools::findAngleOfRay(cv::Point start, cv::Point end)
+double MyTools::findAngleOfRay(Point start, Point end)
 {
+	cout << "MyTools::findAngleOfRay" << endl;
 	double theta = 0;
 	if(end.x == start.x)
 		return theta;
 	else
-		theta = std::atan((double)(end.y - start.y) / (double)(end.x - start.x));
+		theta = atan((double)(end.y - start.y) / (double)(end.x - start.x));
 
 	return theta;
 }
-cv::Vec2i MyTools::findDirectionOfRay(cv::Point start,cv::Point end)
+Vec2i MyTools::findDirectionOfRay(Point start,Point end)
 {
-	cv::Vec2i vec(end.x - start.x, end.y - start.y);
+	cout << "MyTools::findDirectionOfRay" << endl;
+	Vec2i vec(end.x - start.x, end.y - start.y);
 	return vec;
 }
-double MyTools::findSlope(cv::Point v1, cv::Point v2)
+double MyTools::findSlope(Point v1, Point v2)
 {
+	cout << "MyTools::findSlope" << endl;
 	double slope = (double)(v2.y - v1.y)/(double)(v2.x - v1.x);
 	return slope;
 }
 
-int MyTools::findPointId(cv::Point pt, std::vector<cv::Point> pointSet)
+int MyTools::findPointId(Point pt, vector<Point> pointSet)
 {
+	cout << "MyTools::findPointId" << endl;
 	bool ptFound = false;
 	int id = -1;
 	for(unsigned i = 0; i < pointSet.size() && !ptFound; i++)
@@ -115,11 +128,12 @@ int MyTools::findPointId(cv::Point pt, std::vector<cv::Point> pointSet)
 	return id;
 }
 
-cv::Point MyTools::findCentroid(std::vector<cv::Point*> pointSet)
+Point MyTools::findCentroid(vector<Point*> pointSet)
 {
+	cout << "MyTools::findCentroid" << endl;
 	double x = 0;
 	double y = 0;
-	int i = 0;
+	unsigned i = 0;
 	for(i = 0; i < pointSet.size(); i++)
 	{
 		x += pointSet[i]->x;
@@ -129,13 +143,14 @@ cv::Point MyTools::findCentroid(std::vector<cv::Point*> pointSet)
 	x = x/i;
 	y = y/i;
 
-	return cv::Point(x,y);
+	return Point(x,y);
 }
-cv::Point MyTools::findCentroid(std::vector<int> id, std::vector<Node*> map)
+Point MyTools::findCentroid(vector<int> id, vector<Node*> map)
 {
+	cout << "MyTools::findCentroid" << endl;
 	double x = 0;
 	double y = 0;
-	int i = 0;
+	unsigned i = 0;
 	for(i = 0; i < id.size(); i++)
 	{
 		x += map[id[i]]->pt.x;
@@ -145,19 +160,20 @@ cv::Point MyTools::findCentroid(std::vector<int> id, std::vector<Node*> map)
 	x = x/i;
 	y = y/i;
 
-	return cv::Point(x,y);
+	return Point(x,y);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 //Map functions
-int MyTools::findNodeId(cv::Point pt, std::vector<Node*> map)
+int MyTools::findNodeId(Point pt, vector<Node*> map)
 {
+	cout << "MyTools::findNodeId" << endl;
 	//We try to look for the id of the closest node in the map that matches the id.
 	//The max distance the closest node can be is 19
 	int dist = 3;
-	for(int j = 0; j < 20; j++,dist++)
+	for(unsigned j = 0; j < 20; j++,dist++)
 	{
-		for(int i = 0; i < map.size(); i++)
+		for(unsigned i = 0; i < map.size(); i++)
 		{
 			if(findDistance(pt, map[i]->pt) < dist)
 				return i;
@@ -169,11 +185,13 @@ int MyTools::findNodeId(cv::Point pt, std::vector<Node*> map)
 //Finds the path as a vector of ints from the src to the destination in the map. Applies dijkstra
 //to do this. We also bother to add all nodes that aren't part of the closest path but also in between 
 //the src and dest paths. 
-std::deque<int> MyTools::findClosestPath(int src, int dest, std::vector<Node*> map)
+deque<int> MyTools::findClosestPath(int src, int dest, vector<Node*> map)
 {
+	cout << "MyTools::findClosestPath" << endl;
+
 	mapNodesDijkstra(src,map);
-	std::deque<int> path;
-	std::vector<int> node3;
+	deque<int> path;
+	vector<int> node3;
 	path.push_front(dest);
 	Node tmp = *map[dest];
 
@@ -191,13 +209,13 @@ std::deque<int> MyTools::findClosestPath(int src, int dest, std::vector<Node*> m
 	path.push_back(src);
 	//Go through all nodes in the map and check all nodes that start from a 1 edge node in the map and 
 	//check if it leads to a 3 edge node in the path.
-	for(int i = 0; i < map.size(); i++)
+	for(unsigned i = 0; i < map.size(); i++)
 	{
 		//Check if node is a 1 edge node
 		if(map[i]->edge.size() == 1)
 		{
 			bool check = false;
-			std::deque<int> tmpPath;
+			deque<int> tmpPath;
 		
 			tmp = *map[i];
 			tmpPath.push_front(i);
@@ -219,7 +237,7 @@ std::deque<int> MyTools::findClosestPath(int src, int dest, std::vector<Node*> m
 
 					if(tmp.edge.size() >= 3)
 					{
-						for(int a = 0; a < node3.size(); a++)
+						for(unsigned a = 0; a < node3.size(); a++)
 						{
 							if(currentNodeId == node3[a])
 								check = true;
@@ -231,7 +249,7 @@ std::deque<int> MyTools::findClosestPath(int src, int dest, std::vector<Node*> m
 			//If the 3 edge node is in the original path (tmpPath U path)
 			if(check)
 			{
-				for(int tmpPathID = 0; tmpPathID < tmpPath.size(); tmpPathID++)
+				for(unsigned tmpPathID = 0; tmpPathID < tmpPath.size(); tmpPathID++)
 				{
 					path.push_back(tmpPath[tmpPathID]);
 				}
@@ -241,9 +259,10 @@ std::deque<int> MyTools::findClosestPath(int src, int dest, std::vector<Node*> m
 
 	return path;
 }
-void MyTools::traversePath(int src, int prev, int dest, std::vector<Node*> map)
+void MyTools::traversePath(int src, int prev, int dest, vector<Node*> map)
 {
-	/*for(int i = 0; i < map[src]->edge.size(); i++)
+	cout << "MyTools::traversePath" << endl;
+	/*for(unsigned i = 0; i < map[src]->edge.size(); i++)
 	{
 		if(map[src]->edge[i]->id == prev)
 		{
@@ -253,21 +272,21 @@ void MyTools::traversePath(int src, int prev, int dest, std::vector<Node*> map)
 		}
 		else
 		{
-			std::cout << 
+			cout << 
 			traversePath(map[src]->edge[i]->id,src,dest,map);
 		}
 	}*/
 }
 
 //Work in progress
-std::vector<int*> MyTools::findAllPaths(int src, int dest, std::vector<Node*> map)
+vector<int*> MyTools::findAllPaths(int src, int dest, vector<Node*> map)
 {
+	cout << "MyTools::findAllPaths" << endl;
 	int* path = new int[map.size() - 1];
-	std::vector<int*> paths;
+	vector<int*> paths;
 	bool* visited = new bool[map.size() - 1];
-	int pathid = 0;
 
-	for(int i = 0; i < map.size() -1; i++)
+	for(unsigned i = 0; i < map.size() -1; i++)
 		visited[i] = false;
 
 
@@ -279,11 +298,12 @@ std::vector<int*> MyTools::findAllPaths(int src, int dest, std::vector<Node*> ma
 }
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-std::vector<Node*> MyTools::mapNodesDijkstra(int srcid, std::vector<Node*> set)
+vector<Node*> MyTools::mapNodesDijkstra(int srcid, vector<Node*> set)
 {
-	std::vector<int> myQ;
+	cout << "MyTools::mapNodesDijkstra" << endl;
+	vector<int> myQ;
 
-	for(int i = 0; i < set.size(); i++)
+	for(unsigned i = 0; i < set.size(); i++)
 	{
 		
 		set[i]->dist = 1000000000;
@@ -301,7 +321,7 @@ std::vector<Node*> MyTools::mapNodesDijkstra(int srcid, std::vector<Node*> set)
 		//Find the smallest distance from source
 		//remove the shortest path node from myQ
 		int smallest = 1000000000;
-		for(int i = 0; i < myQ.size(); i++)
+		for(unsigned i = 0; i < myQ.size(); i++)
 		{
 			if(set[myQ[i]]->dist < smallest)
 			{
@@ -313,7 +333,7 @@ std::vector<Node*> MyTools::mapNodesDijkstra(int srcid, std::vector<Node*> set)
 		///////////////////////////////////////////////////////////////////////////////////////////
 		int length = 0;
 		
-		for(int i = 0; i < set[myQ[id]]->edge.size(); i++)
+		for(unsigned i = 0; i < set[myQ[id]]->edge.size(); i++)
 		{
 			//For each adjacent node to set[myQ[id]]
 			//Update dist <- length
@@ -330,12 +350,13 @@ std::vector<Node*> MyTools::mapNodesDijkstra(int srcid, std::vector<Node*> set)
 
 	return set;
 }
-std::vector<Node*> MyTools::mapNodesPrim(std::vector<Node*> set)
+vector<Node*> MyTools::mapNodesPrim(vector<Node*> set)
 {
-	std::vector<int> reachedSet;
-	std::vector<int> unreachedSet;
+	cout << "MyTools::mapNodesPrim" << endl;
+	vector<int> reachedSet;
+	vector<int> unreachedSet;
 
-	for(int i = 0; i < set.size(); i++)
+	for(unsigned i = 0; i < set.size(); i++)
 	{
 		if(i != 0)
 			unreachedSet.push_back(i);
@@ -348,9 +369,9 @@ std::vector<Node*> MyTools::mapNodesPrim(std::vector<Node*> set)
 	{
 		int smallest = 1000000;
 		int idi, idj;
-		for(int i = 0; i < reachedSet.size(); i++)
+		for(unsigned i = 0; i < reachedSet.size(); i++)
 		{
-			for(int j = 0; j < unreachedSet.size(); j++)
+			for(unsigned j = 0; j < unreachedSet.size(); j++)
 			{
 				int dist = findDistance(set[reachedSet[i]]->pt,set[unreachedSet[j]]->pt);
 				if(dist < smallest)
@@ -375,20 +396,22 @@ std::vector<Node*> MyTools::mapNodesPrim(std::vector<Node*> set)
 
 
 //Set Mathematics
-void MyTools::unionOfPoints(std::vector<cv::Point> set1,std::vector<cv::Point> set2, std::vector<cv::Point> output)
+void MyTools::unionOfPoints(vector<Point> set1,vector<Point> set2, vector<Point> output)
 {
+	cout << "MyTools::unionOfPoints" << endl;
 	if(!output.empty())
 		output.clear();
 
-	for(int i = 0; i < set1.size(); i++)
+	for(unsigned i = 0; i < set1.size(); i++)
 		output.push_back(set1[i]);
 
-	for(int i = 0; i < set2.size(); i++)
+	for(unsigned i = 0; i < set2.size(); i++)
 		output.push_back(set2[i]);
 
 }
-void MyTools::intersectionOfPoints(std::vector<cv::Point> set1,std::vector<cv::Point> set2, std::vector<cv::Point> output)
+void MyTools::intersectionOfPoints(vector<Point> set1,vector<Point> set2, vector<Point> output)
 {
+	cout << "MyTools::intersectionOfPoints" << endl;
 	if(!output.empty())
 		output.clear();
 
@@ -401,8 +424,9 @@ void MyTools::intersectionOfPoints(std::vector<cv::Point> set1,std::vector<cv::P
 		}
 	}
 }
-void MyTools::subtractionOfPoints(std::vector<cv::Point> set1,std::vector<cv::Point> set2, std::vector<cv::Point> output)
+void MyTools::subtractionOfPoints(vector<Point> set1,vector<Point> set2, vector<Point> output)
 {
+	cout << "MyTools::subtractionOfPoints" << endl;
 	if(!output.empty())
 		output.clear();
 	for(unsigned i = 0; i < set1.size(); i++)
@@ -416,28 +440,29 @@ void MyTools::subtractionOfPoints(std::vector<cv::Point> set1,std::vector<cv::Po
 		}
 	}
 }
-bool MyTools::doesIntersect(cv::Mat img1, cv::Mat img2)
+bool MyTools::doesIntersect(Mat img1, Mat img2)
 {
+	cout << "MyTools:doesIntersect" << endl;
 	//Should later make sure that all image types are of type CV_8U to make the comparison
-	cv::Mat img3;
-	img3 = cv::Mat::zeros(img1.size().width,img1.size().height,CV_8U);
+	Mat img3;
+	img3 = Mat::zeros(img1.size().width,img1.size().height,CV_8U);
 	img3 = img1 & img2;
 
-	cv::Point minpt, maxpt;
-	cv::minMaxLoc(img3,NULL,NULL,&minpt,&maxpt);
+	Point minpt, maxpt;
+	minMaxLoc(img3,NULL,NULL,&minpt,&maxpt);
 
 	//Draws the intersection of img1 and img2 on img3 and if it finds
 	//a bright spot we say there is an intersection.
 
-	//cv::namedWindow("img1",CV_WINDOW_FREERATIO);
-	//cv::namedWindow("img2",CV_WINDOW_FREERATIO);
-	//cv::namedWindow("img3",CV_WINDOW_FREERATIO);
+	//namedWindow("img1",CV_WINDOW_FREERATIO);
+	//namedWindow("img2",CV_WINDOW_FREERATIO);
+	//namedWindow("img3",CV_WINDOW_FREERATIO);
 
-	//cv::imshow("img1",img1);
-	//cv::imshow("img2",img2);
-	//cv::imshow("img3",img3);
+	//imshow("img1",img1);
+	//imshow("img2",img2);
+	//imshow("img3",img3);
 
-	//cv::waitKey();
+	//waitKey();
 
 	if(minpt.x == maxpt.x && minpt.y == maxpt.y)
 		return false;
@@ -446,14 +471,15 @@ bool MyTools::doesIntersect(cv::Mat img1, cv::Mat img2)
 }
 
 //Tools to transform shape or point post processing
-cv::Point MyTools::jitterCircle(cv::Point c, double radius, cv::Mat shape)
+Point MyTools::jitterCircle(Point c, double radius, Mat shape)
 {
-	cv::Mat circle;
+	cout << "MyTools::jitterCircle" << endl;
+	Mat circle_img;
 	int x = c.x;
 	int y = c.y;
-	circle = cv::Mat::zeros(shape.size(),CV_8U);
-	//cv::imshow("",shape);
-	//cv::waitKey();
+	circle_img = Mat::zeros(shape.size(),CV_8U);
+	//imshow("",shape);
+	//waitKey();
 	
 	//Trial Number2
 	for(double radian = 0; radian < 6.2; radian+=0.1)
@@ -461,42 +487,43 @@ cv::Point MyTools::jitterCircle(cv::Point c, double radius, cv::Mat shape)
 		c.x = x + 5 * cos(radian);
 		c.y = y + 5 * sin(radian);
 
-		cv::circle(circle,c,radius,cv::Scalar(255,255,255),1,8);
-		if(doesIntersect(shape,circle))
+		circle(circle_img,c,radius,Scalar(255,255,255),1,8);
+		if(doesIntersect(shape,circle_img))
 		{
 				c.x = x;
 				c.y = y;
 		}
 		else
 		{
-			//cv::circle(shape,c,radius,cv::Scalar(255,255,255),2,8);
-			//cv::imshow("",shape);
-			//cv::waitKey();
+			//circle(shape,c,radius,Scalar(255,255,255),2,8);
+			//imshow("",shape);
+			//waitKey();
 		
 			return c;
 		}
 
-		circle = cv::Mat::zeros(circle.size(),CV_8U);
+		circle_img = Mat::zeros(circle_img.size(),CV_8U);
 	}
 
 	return c;
 }
-std::vector<cv::Point> MyTools::findIntersections(cv::Mat img1, cv::Mat img2)
+vector<Point> MyTools::findIntersections(Mat img1, Mat img2)
 {
-	std::vector<cv::Point> intersectPoints;
-	cv::Mat intersection;
-	intersection = cv::Mat::zeros(img1.size(),CV_8U);
+	cout << "MyTools::findIntersections" << endl;
+	vector<Point> intersectPoints;
+	Mat intersection;
+	intersection = Mat::zeros(img1.size(),CV_8U);
 	intersection = img1 & img2;
 
-	cv::Point minpt, maxpt;
+	Point minpt, maxpt;
 
 	do
 	{
-		cv::minMaxLoc(intersection,NULL,NULL,&minpt,&maxpt);
+		minMaxLoc(intersection,NULL,NULL,&minpt,&maxpt);
 		if(minpt.x != maxpt.x && minpt.y != maxpt.y)
 			intersectPoints.push_back(maxpt);
 
-		cv::circle(intersection, maxpt,40,cv::Scalar(0,0,0),-1,8);
+		circle(intersection, maxpt,40,Scalar(0,0,0),-1,8);
 
 	}while(minpt.x != maxpt.x && minpt.y != maxpt.y);
 
@@ -505,43 +532,49 @@ std::vector<cv::Point> MyTools::findIntersections(cv::Mat img1, cv::Mat img2)
 
 
 //pre-processing
-//removeOutliers uses cv::fitEllipse to find a region where the cluster of points are fairly close to each other
-void MyTools::closeOpenContours(cv::Mat img, std::vector<std::vector<cv::Point>> contour)
+//removeOutliers uses fitEllipse to find a region where the cluster of points are fairly close to each other
+void MyTools::closeOpenContours(Mat img, vector<vector<Point> > contour)
 {
+	cout <<"MyTools::closeOpenContours" << endl;
 
 }
-std::vector<std::vector<cv::Point>> MyTools::removeOutliers(std::vector<std::vector<cv::Point>> contour)
+vector< vector<Point> > MyTools::removeOutliers(vector<vector<Point> > contour)
 {
-	std::vector<cv::Point> pointSet;
+	cout << "MyTools::removeOutliers" << endl;
+
+	vector<Point> pointSet;
 	for(unsigned i = 0; i < contour.size(); i++)
 	{
 		for(unsigned j = 0; j < contour[i].size(); j++)
 			pointSet.push_back(contour[i][j]);
 	}
-	cv::RotatedRect ellipse = cv::fitEllipse(pointSet);
 
-	std::vector<int> distances;
+	if(pointSet.size() > 20)
+	{
+	RotatedRect ellipse = fitEllipse(pointSet);
+
+	vector<int> distances;
 	for(unsigned i = 0; i < pointSet.size(); i++)
 	{
 		distances.push_back(MyTools::findDistance(ellipse.center,pointSet[i]));
 	}
 
-	std::sort(distances.begin(),distances.end());
+	sort(distances.begin(),distances.end());
 	double q1,q3,IQR;
 	q1 = distances[(int)(pointSet.size()/4)];
 	q3 = distances[(int)(pointSet.size()/4 * 3)];
-	//std::cout << q1 << "," << q3 << std::endl;
+	//cout << q1 << "," << q3 << endl;
 	IQR = q3-q1;
 	
-	int i = 0;
+	unsigned i = 0;
 	while(i < contour.size())
 	{
-		int j = 0;
+		unsigned j = 0;
 		while(j < contour[i].size())
 		{
 			if(MyTools::findDistance(ellipse.center,contour[i][j]) > q3 + 1.5*IQR)
 			{
-				//std::cout << MyTools::findDistance(ellipse.center,contour[i][j]) << std::endl;
+				//cout << MyTools::findDistance(ellipse.center,contour[i][j]) << endl;
 				contour[i].erase(contour[i].begin() + j);
 			}
 			else
@@ -549,23 +582,27 @@ std::vector<std::vector<cv::Point>> MyTools::removeOutliers(std::vector<std::vec
 		}
 		i++;
 	}
+	}
+	else
+	{
+		cout << "error: set size is too small" << endl;
+	}
 	
 	return contour;
 }
-std::vector<cv::Point*> MyTools::reduction(std::vector<cv::Point*> set, int reductionSize)
+vector<Point*> MyTools::reduction(vector<Point*> set, int reductionSize)
 {
-	int i = 0;
-	int j = 0;
-	std::vector<int> setid;
-	cv::Mat drawing;
+	cout << "MyTools::reduction" << endl;
+	vector<int> setid;
+	Mat drawing;
 	
 	int x, y, count;
-	for(int i = 0; i < set.size(); i++)
+	for(unsigned i = 0; i < set.size(); i++)
 	{
 		x = 0;
 		y = 0;
 		count = 0;
-		for(int j = 0; j < set.size(); j++)
+		for(unsigned j = 0; j < set.size(); j++)
 		{
 			if(i == j)
 			{}
@@ -583,13 +620,13 @@ std::vector<cv::Point*> MyTools::reduction(std::vector<cv::Point*> set, int redu
 
 		if(count >= 4)
 		{
-			std::sort(setid.begin(),setid.end());
-			for(int a = setid.size(); a > 0; a--)
+			sort(setid.begin(),setid.end());
+			for(unsigned a = setid.size(); a > 0; a--)
 			{
-				if(setid[a - 1] >= set.size())
+				if((unsigned)setid[a - 1] >= set.size())
 				{
-					std::cout << setid[a - 1] << " setid" << std::endl;
-					std::cout << set.size() << " setsize" << std::endl;
+					cout << setid[a - 1] << " setid" << endl;
+					cout << set.size() << " setsize" << endl;
 				}
 				else
 				{
@@ -599,43 +636,45 @@ std::vector<cv::Point*> MyTools::reduction(std::vector<cv::Point*> set, int redu
 			}
 			x = x / count;
 			y = y / count;
-			set.push_back(new cv::Point(x,y));
+			set.push_back(new Point(x,y));
 			setid.clear();
 		}
 	}
 	return set;
 }
-std::vector<cv::Point> MyTools::randomize(std::vector<cv::Point> set)
+vector<Point> MyTools::randomize(vector<Point> set)
 {
-	std::vector<cv::Point> randomSet;
+	cout << "MyTools::randomize" << endl;
+	vector<Point> randomSet;
 	int randid;
-	std::cout << set.size() << std::endl;
-	for(int i = set.size(); i > 0; i--)
+	cout << set.size() << endl;
+	for(unsigned i = set.size(); i > 0; i--)
 	{
-		randid = std::rand() % set.size();
-		cv::Point temp = set[randid];
+		randid = rand() % set.size();
+		Point temp = set[randid];
 		set.erase(set.begin() + randid);
 		randomSet.push_back(temp);
 	}
-	//std::cout << randomSet.size() << std::endl;
+	//cout << randomSet.size() << endl;
 	return randomSet;
 }
-void MyTools::closeImageDijkstra(std::vector<Node*> set, cv::Mat img) //The image must have Dijkstra run on it first.
+void MyTools::closeImageDijkstra(vector<Node*> set, Mat img) //The image must have Dijkstra run on it first.
 {
-	std::vector<Node> setx;
+	cout << "MyTools::closeImageDijkstra" << endl;
+	vector<Node> setx;
 	//Push all nodes with only 1 edge into setx
-	for(int i = 0; i < set.size(); i++)
+	for(unsigned i = 0; i < set.size(); i++)
 	{
 		if(set[i]->edge.size() == 1 && set[i]->dist != 0)
 			setx.push_back(*set[i]);
 	}
 
 	int largest = 0;
-	int id1 = 0;
+	unsigned id1 = 0;
 	int id2 = 0;
 	int closest = 500000;
 
-	for(int i = 0; i < setx.size(); i++)
+	for(unsigned i = 0; i < setx.size(); i++)
 	{
 		if(setx[i].dist > largest)
 		{
@@ -644,7 +683,7 @@ void MyTools::closeImageDijkstra(std::vector<Node*> set, cv::Mat img) //The imag
 		}
 	}
 	
-	for(int i = 0; i < setx.size(); i++)
+	for(unsigned i = 0; i < setx.size(); i++)
 	{
 		double dist = findDistance(setx[id1].pt,setx[i].pt);
 		if(dist < closest && id1 != i)
@@ -654,14 +693,15 @@ void MyTools::closeImageDijkstra(std::vector<Node*> set, cv::Mat img) //The imag
 		}
 	}
 
-	cv::line(img,setx[id1].pt,setx[id2].pt,cv::Scalar(255,255,0),2,8,0);
+	line(img,setx[id1].pt,setx[id2].pt,Scalar(255,255,0),2,8,0);
 }
-void MyTools::closeImage(std::vector<Node*> set, cv::Mat img)
+void MyTools::closeImage(vector<Node*> set, Mat img)
 {
+	cout << "MyTools::closeImage" << endl;
 	//Push back all nodes with only 1 edge into setx
-	std::vector<int> setx;
-	std::vector<int> sety;
-	for(int i = 0; i < set.size(); i++)
+	vector<int> setx;
+	vector<int> sety;
+	for(unsigned i = 0; i < set.size(); i++)
 	{
 		if(set[i]->edge.size() == 1)
 			setx.push_back(i);
@@ -670,9 +710,9 @@ void MyTools::closeImage(std::vector<Node*> set, cv::Mat img)
 	}
 
 	//erase all nodes that are super close to a node with 3 edges
-	for(int i = 0; i < setx.size(); i++)
+	for(unsigned i = 0; i < setx.size(); i++)
 	{
-		for(int j = 0; j < sety.size(); j++)
+		for(unsigned j = 0; j < sety.size(); j++)
 		{
 			if(i >= setx.size())
 			{}
@@ -693,9 +733,9 @@ void MyTools::closeImage(std::vector<Node*> set, cv::Mat img)
 	int id1 = 0;
 	int id2 = 0;
 	double smallest = 50000;
-	for(int i = 0; i < setx.size(); i++)
+	for(unsigned i = 0; i < setx.size(); i++)
 	{
-		for(int j = 0; j < setx.size(); j++)
+		for(unsigned j = 0; j < setx.size(); j++)
 		{
 			if( i == j)
 			{
@@ -716,5 +756,5 @@ void MyTools::closeImage(std::vector<Node*> set, cv::Mat img)
 	//Connect the two nodes using the indexes.
 	set[setx[id1]]->edge.push_back(set[setx[id2]]);
 	set[setx[id2]]->edge.push_back(set[setx[id1]]);
-	cv::line(img,set[setx[id1]]->pt,set[setx[id2]]->pt,cv::Scalar(255,255,0),2,8,0);
+	line(img,set[setx[id1]]->pt,set[setx[id2]]->pt,Scalar(255,255,0),2,8,0);
 }

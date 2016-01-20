@@ -1,23 +1,26 @@
-#include <iostream>
-#include <opencv2/opencv.hpp>
 
-#include "FeatureDetector.h"
+#include "MyFeatureDetector.h"
 
-void main()
+using namespace std;
+
+int main()
 {
-	FeatureDetector* myDetector = new FeatureDetector();
-	myDetector->init("Shape1/shape1-001.ppm");
-	myDetector->drawCircle2();
+	MyFeatureDetector* myDetector = new MyFeatureDetector();
+	myDetector->init("Flowers/Shape1/shape1-001.ppm");
+	//myDetector->drawCircle2();
 	//myDetector->test();
 	
 	//MyTools tool = MyTools();
-	//cv::waitKey();
+	//waitKey();
 	//myDetector->drawCircle(0);
 	//myDetector->drawCircle_man(0);
 
 	//myDetector->drawMoreCircles(0,0);
-	//std::cout << "hello worl0" << std::endl;
+	//cout << "hello worl0" << endl;
 
 	myDetector->exit();
 	delete myDetector;
+
+	return 1;
 }
+

@@ -1,5 +1,7 @@
 #include "Node.h"
 
+using namespace std;
+using namespace cv;
 
 Node::Node(void)
 {
