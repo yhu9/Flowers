@@ -1,0 +1,16 @@
+Masa Hu
+1/21/16
+
+		Brief description of the changes made
+
+1. Created a Makefile and a CMakeLists.txt file to make compiling the program from the terminal a lot easier.
+
+2. I also created a testall.cpp file which will later be included in the make file described above in order to test all the current functions made. This file has not yet been implemented however and will be used later once the code is refactored.
+
+3. All of the files as well as the updates have been posted on a git repository.
+
+4. After moving to a linux operating system I found that some of the functions created on windows does not work correctly as before. A bunch of refactoring was done in order for the program to function the same way as it did on a Windows machine. Some of these problems could have likely been avoided if a different installation method was taken upon first using openCV with the Windows OS. Some of the issues include, file naming styles, library include paths, and the use of namespaces. As of now the test function works correctly but several of the newer functions created before making the switch to linux still does not work properly and needs further fixes. Once all the functions work as it should progress will continue.
+
+5. After running into OS problems I wonder about the need to make my program's compatibility with other OS types a requirement for the finishing of the product. However, as of now it will simply be noted that the program does not function correctly on a Windows machine in its raw state.
+
+Sincerely, Masa Hu

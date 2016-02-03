@@ -1,14 +1,18 @@
 OBJECTS = MyTools.o Circle.o Node.o MyFeatureDetector.o main.o
-PROGRAM = executable 
+TESTINGOBJECTS = MyTools.o Circle.o Node.o MyFeatureDetector.o testall.o
+PROGRAM = executable
+TESTING = test
 CXX ?= g++
 DEBUG = -g
 
 CXXFLAGS += -c -Wall $(shell pkg-config --cflags opencv)
 LDFLAGS += $(shell pkg-config --libs --static opencv)
 
-all: executable
+all: executable test
 
 executable: $(OBJECTS); $(CXX) $(OBJECTS) -o $(PROGRAM) $(LDFLAGS)
+
+test: $(TESTINGOBJECTS); $(CXX) $(TESTINGOBJECTS) -o $(TESTING) $(LDFLAGS)
 
 
 # mCenek's code for compiling multiple files at the same time
@@ -27,7 +31,10 @@ MyFeatureDetector.o: MyFeatureDetector.cpp
 main.o: main.cpp
 	$(CXX) $(CXXFLAGS) main.cpp
 
+testall.o: testall.cpp
+	$(CXX) $(CXXFLAGS) testall.cpp
+
 # opencv example code
 # %.o: %.cpp; $(CXX) $< -o $@ $(CXXFLAGS)
 
-clean: ; rm -f MyTools.o Circle.o Node.o MyFeatureDetector.o main.o executable
+clean: ; rm -f MyTools.o Circle.o Node.o MyFeatureDetector.o main.o executable test.o test

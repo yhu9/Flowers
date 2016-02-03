@@ -19,27 +19,39 @@ public:
 	MyTools();
 	~MyTools();
 
+
 	void outlineContour(vector<vector<Point> >,Mat);
+	//Math Tools
+	
+	//Vector tools
+	Vec2i makeVector(Point start, Point end);
+	Vec2d normalize(Vec2i vector);
+	Vec2i simplifyVector(Vec2i vector);
+
+	//Geometry tools
 	double findAngleOfRay(Point, Point);
-	Vec2i findDirectionOfRay(Point start,Point end);
 	double findDistance(Point v1, Point v2);
 	Point findMidPoint(Point v1,Point v2);
+	double findSlope(Point, Point);
 
 	//Returns either a point or the index of the closest point to a given point
 	Point findClosestPoint(int,int,vector<Point>);
 	Point findClosestPoint(Point center, vector<Node> contour);
 	int findPointId(Point pt,vector<Point> pointSet);
 	int findClosestPoint(Point,vector<Point>);
-	double findSlope(Point, Point);
-
+	
 	Point findCentroid(vector<Point*> pointSet);
 	Point findCentroid(vector<int> id, vector<Node*> map);
 
-	vector<Point> findIntersections(Mat img1, Mat img2);
-	
+		
 	//For checking things about image placement
-	bool findPtInShape(Point,vector<Point>);
-	bool doesIntersect(Mat img1, Mat img2);
+	bool findPtInShape(Point,vector<Point>);	//does not work
+	bool doesIntersect(Mat img1, Mat img2);		//checks to see if img1 and img2 intersect
+	bool isInside(Point pt, Mat img);		//checks to see if pt is inside img
+	bool isOn(Point pt, Mat img);			//checks to see if pt is on img
+	bool isInsideAndNotOn(Point pt, Mat img);		//checks to see if pt is inside and Not on img
+	vector<Point> findIntersections(Mat img1, Mat img2);	//finds the intersections of img1 and img2
+	
 
 	//For pre-processing the image
 	void closeOpenContours(Mat,vector<vector<Point> >);

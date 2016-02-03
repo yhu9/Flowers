@@ -5,8 +5,8 @@ MyTools::~MyTools(){}
 
 using namespace cv;
 using namespace std;
-//Some useful trigonometry and geometry tools
 
+//Some useful trigonometry and geometry tools
 Point MyTools::findClosestPoint(int x, int y, vector<Point> contour)
 {
 	cout << "MyTools::findClosestPoint" << endl;
@@ -81,7 +81,6 @@ void MyTools::outlineContour(vector<vector<Point> > contour, Mat img)
 }
 double MyTools::findDistance(Point v1, Point v2)
 {
-	cout << "MyTools::findDistance" << endl;
 	double distance = -1;
 
 	distance = sqrt(pow((double)(v2.x - v1.x), 2) + pow((double)v2.y - (double)v1.y,2));
@@ -89,7 +88,7 @@ double MyTools::findDistance(Point v1, Point v2)
 }
 double MyTools::findAngleOfRay(Point start, Point end)
 {
-	cout << "MyTools::findAngleOfRay" << endl;
+  cout << "MyTools::findAngleOfRay" << endl;
 	double theta = 0;
 	if(end.x == start.x)
 		return theta;
@@ -98,7 +97,7 @@ double MyTools::findAngleOfRay(Point start, Point end)
 
 	return theta;
 }
-Vec2i MyTools::findDirectionOfRay(Point start,Point end)
+Vec2i MyTools::makeVector(Point start,Point end)
 {
 	cout << "MyTools::findDirectionOfRay" << endl;
 	Vec2i vec(end.x - start.x, end.y - start.y);
@@ -442,7 +441,7 @@ void MyTools::subtractionOfPoints(vector<Point> set1,vector<Point> set2, vector<
 }
 bool MyTools::doesIntersect(Mat img1, Mat img2)
 {
-	cout << "MyTools:doesIntersect" << endl;
+	//cout << "MyTools:doesIntersect" << endl;
 	//Should later make sure that all image types are of type CV_8U to make the comparison
 	Mat img3;
 	img3 = Mat::zeros(img1.size().width,img1.size().height,CV_8U);
@@ -473,7 +472,6 @@ bool MyTools::doesIntersect(Mat img1, Mat img2)
 //Tools to transform shape or point post processing
 Point MyTools::jitterCircle(Point c, double radius, Mat shape)
 {
-	cout << "MyTools::jitterCircle" << endl;
 	Mat circle_img;
 	int x = c.x;
 	int y = c.y;
@@ -509,12 +507,10 @@ Point MyTools::jitterCircle(Point c, double radius, Mat shape)
 }
 vector<Point> MyTools::findIntersections(Mat img1, Mat img2)
 {
-	cout << "MyTools::findIntersections" << endl;
 	vector<Point> intersectPoints;
 	Mat intersection;
 	intersection = Mat::zeros(img1.size(),CV_8U);
 	intersection = img1 & img2;
-
 	Point minpt, maxpt;
 
 	do
@@ -527,6 +523,7 @@ vector<Point> MyTools::findIntersections(Mat img1, Mat img2)
 
 	}while(minpt.x != maxpt.x && minpt.y != maxpt.y);
 
+	//If no intersect points are found then an empty set is returned
 	return intersectPoints;
 }
 
@@ -551,6 +548,8 @@ vector< vector<Point> > MyTools::removeOutliers(vector<vector<Point> > contour)
 
 	if(pointSet.size() > 20)
 	{
+
+		cout << pointSet.size() << endl;
 	RotatedRect ellipse = fitEllipse(pointSet);
 
 	vector<int> distances;
@@ -658,6 +657,7 @@ vector<Point> MyTools::randomize(vector<Point> set)
 	//cout << randomSet.size() << endl;
 	return randomSet;
 }
+
 void MyTools::closeImageDijkstra(vector<Node*> set, Mat img) //The image must have Dijkstra run on it first.
 {
 	cout << "MyTools::closeImageDijkstra" << endl;
@@ -758,3 +758,74 @@ void MyTools::closeImage(vector<Node*> set, Mat img)
 	set[setx[id2]]->edge.push_back(set[setx[id1]]);
 	line(img,set[setx[id1]]->pt,set[setx[id2]]->pt,Scalar(255,255,0),2,8,0);
 }
+
+bool MyTools::isInside(Point pt, Mat img)
+{
+	Point tempPoint(pt.x, 0);
+	Mat tempImg = Mat::zeros(img.size(), CV_8U);
+	line(tempImg, pt, tempPoint, Scalar(255,255,255), 1,8);
+
+	if(findIntersections(tempImg, img).size() % 2 == 1)
+		return true;
+	
+	return false;
+}
+
+Vec2d MyTools::normalize(Vec2i vector)
+{
+	Vec2d normalizedVector;
+	double length = sqrt(vector[0] * vector[0] + vector[1] * vector[1]);
+	normalizedVector[0] = vector[0]/length;
+	normalizedVector[1] = vector[1]/length;
+
+	return normalizedVector;
+}
+
+bool MyTools::isOn(Point pt, Mat img)
+{
+	Scalar intensity = img.at<uchar>(pt);
+
+	return (intensity.val[0] == 255 
+			|| intensity.val[1] == 255 
+			|| intensity.val[2] == 255);
+
+}
+
+bool MyTools::isInsideAndNotOn(Point pt, Mat img)
+{
+	return isInside(pt,img) && !isOn(pt,img);
+}
+
+Vec2i MyTools::simplifyVector(Vec2i vector)
+{
+	Vec2i simplifiedVector;
+	unsigned y = abs(vector[0]);
+	unsigned z = abs(vector[1]);
+	if(z > y)
+		{
+			unsigned temp = y;
+			y = z;
+			z = temp;
+		}
+	while(z != 0)
+	{
+		unsigned x = y % z;
+		y = z;
+		z = x;
+	}
+
+	simplifiedVector[0] = (int)(vector[0] / y);
+	simplifiedVector[1] = (int)(vector[1] / y);
+
+	return simplifiedVector;
+}
+
+
+
+
+
+
+
+
+
+

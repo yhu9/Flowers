@@ -16,13 +16,13 @@ class MyFeatureDetector
 public:
 	MyFeatureDetector(void);
 	~MyFeatureDetector(void);
-	void test();
+	void test(char*);
 	void exit();
 
 	void init(char*);
 	vector<Point> addCircle(int setid,int cid, vector<Point> pointSet);
 
-	void drawCircle2();
+	void drawCircle();
 	
 private:
 	//Variables
@@ -34,10 +34,11 @@ private:
 	vector<Circle> circles;
 	MyTools tools;
 
+public:
 	//Functions
 	void traverseMap();
 	Circle insertCircle(Mat shape, vector<int> set);
-	Circle insertCircle(Mat shape, deque<int> set);
+	Circle insertCircle(Mat shape, Point seed);
 	Mat drawSet(vector<int> set);
 	Mat drawSet(deque<int> set);
 	void separateShape(vector<int> ids);
