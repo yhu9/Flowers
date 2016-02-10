@@ -25,7 +25,8 @@ public:
 	Point findPoint(Vec2i ray);
 
 	Circle(void);
-	Circle(int,int,double);
+	Circle(Point,double,Mat);
+        Circle(int,int,double);
 	Circle(Point, double);
 	~Circle(void);
 };

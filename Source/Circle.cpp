@@ -13,6 +13,14 @@ Circle::Circle(Point centerIn, double radiusIn)
 	createPoints();
 }
 
+Circle::Circle(Point centerIn, double radiusIn, Mat shapeIn)
+{
+        center = centerIn;
+        radius = radiusIn;
+        shape = Mat::zeros(shapeIn.size(),CV_8U);
+        shape = shape | shapeIn;
+}
+
 
 Circle::~Circle(void)
 {
