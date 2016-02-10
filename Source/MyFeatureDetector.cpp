@@ -30,7 +30,6 @@ void MyFeatureDetector::test(char* imgname)
       namedWindow("raw image", CV_WINDOW_FREERATIO);
       imshow("raw image", shapes);
 
-      waitKey(0);
       //Not sure why but for some reason when I use canny I get a clear image of all the shapes but when I
       //run findContours() on shape1 it seems to change the image.
       //Finds the verticies of the image
@@ -42,20 +41,16 @@ void MyFeatureDetector::test(char* imgname)
       namedWindow("blured image", CV_WINDOW_FREERATIO);
       imshow("blured image", detectedEdges);
 		
-      waitKey(0);
 
       Canny(detectedEdges,detectedEdges,50,150,3);
       namedWindow("detected edges", CV_WINDOW_FREERATIO);
       imshow("detected edges", detectedEdges);
 
-      waitKey(0);
       cout << "canny run successfully" << endl;
 
       drawing = drawing + detectedEdges;
       namedWindow("drawing U detectedEdges", CV_WINDOW_FREERATIO);
       imshow("drawing U detectedEdges", drawing);
-
-      waitKey(0);
 
       //Finds contours of the image
       //Basically verticies that are next to each other.
@@ -176,10 +171,10 @@ void MyFeatureDetector::init(char* imgname)
       //if you'd like you can show the basic images we created
       namedWindow("drawing",CV_WINDOW_FREERATIO);
       imshow("drawing",drawing);
+      waitKey(0);
       //namedWindow("reducedImage",CV_WINDOW_FREERATIO);
       //imshow("reducedImage",reducedImage);
 
-      waitKey(0);
       file.close();
     }
   else
@@ -227,7 +222,9 @@ Mat MyFeatureDetector::drawSet(vector<int> set)
 //The function will return a Circle with a radius of -1 if the seed point isn't inside the shape.
 Circle MyFeatureDetector::insertCircle(Mat shape, Point seed)
 {
-  if(!tools.isInside(seed,shape) || tools.isOn(seed,shape)){
+    bool isInside = tools.isInside(seed,shapes);
+    bool isOn = tools.isOn(seed,shape);
+  if(isInside == false || isOn == true){
     Circle falseCircle;
     falseCircle.radius = -1;
     return falseCircle;
@@ -248,14 +245,14 @@ Circle MyFeatureDetector::insertCircle(Mat shape, Point seed)
     {
       do
 	{
-	  circle_img = Mat::zeros(shapes.size(),CV_8U);
+	  circle_img = Mat::zeros(shape.size(),CV_8U);
 	  circle(circle_img,seed,radius,Scalar(255,255,255),2,8);
 
 	  radius++;
-	  t = tools.doesIntersect(shapes, circle_img);
+	  t = tools.doesIntersect(shape, circle_img);
 	}while(!t);
 
-      temp = tools.jitterCircle(seed, radius,shapes);
+      temp = tools.jitterCircle(seed, radius,shape);
 
       if(temp.x == seed.x && temp.y == seed.y)
 	{
@@ -268,7 +265,7 @@ Circle MyFeatureDetector::insertCircle(Mat shape, Point seed)
 
   myCircle.center = seed;
   myCircle.radius = radius;
-  myCircle.shape = Mat::zeros(shapes.size(), CV_8U);
+  myCircle.shape = Mat::zeros(shape.size(), CV_8U);
   circle(myCircle.shape,seed,radius,Scalar(255,255,255),2,8);
 
   return myCircle;
@@ -294,66 +291,77 @@ void MyFeatureDetector::drawCircle()
 {
   //namedWindow("circle", CV_WINDOW_FREERATIO);			
   namedWindow("shapes",CV_WINDOW_FREERATIO);			     
-  //namedWindow("circle U shapes", CV_WINDOW_FREERATIO);	       
-   
+  namedWindow("circles to add", CV_WINDOW_FREERATIO);     
+  Mat circlestoadd = Mat::zeros(shapes.size(), CV_8U);
+  Mat newShape = Mat::zeros(shapes.size(),CV_8U);
+  newShape = shapes | shapes;
+
   Point seed = tools.findCentroid(pSet);
-  vector<Point> stack;
-  stack.push_back(seed);
-  while(stack.size() > 0){
-    //Pop one from stack
-    Point pt = stack.back();
-    stack.pop_back();
+  queue<Point> que;
+  que.push(seed);
+  int t = 1;
+  while(que.size() > 0){
+    //Pop one from que
+    Point pt = que.front();
+    que.pop();
 
-    //insert circle   
-    Circle myCircle = insertCircle(shapes, pt);	
-    //find intersectpts and check how many there are
+    //insert circle  
+    //check to see if you can insert the circle correctly. 
     vector<Point> intersectPoints;
-    intersectPoints = tools.findIntersections(myCircle.shape,shapes);
+    Circle myCircle = insertCircle(newShape, pt);
+    if(myCircle.radius != -1)
+	intersectPoints = tools.findIntersections(myCircle.shape,newShape);
 
-    //temp Mat img to hold the unified image which we later apply to shapes
-    Mat temp = myCircle.shape | shapes;
-	
-    
+    //find intersectpts and check how many there are
 
-    if(intersectPoints.size() > 3)
-      cout << "found more than 3 intersections" << endl;
-    else if(intersectPoints.size() < 3)
+    cout << "iteration: " << t << endl;t++;
+    	cout << "que size: " << que.size() << endl;
+    	cout << "myCircle: " << myCircle.radius << endl;
+	cout << "number of intersections: " << intersectPoints.size() << endl;
+
+    if(intersectPoints.size() < 3)
       cout << "found less than 3 intersections" << endl;
-    else if(intersectPoints.size() == 3)
-      {
-	//find midpts
-	Point midpts[3];
-	for(unsigned i = 0; i < intersectPoints.size(); i++)
-	  midpts[i] = tools.findMidPoint(intersectPoints[i],intersectPoints[(i + 1) % 3]);
-	//find vectors
-	Vec2i vectors[3];
-	for(unsigned i = 0; i < 3; i++)
-	  vectors[i] = tools.makeVector(myCircle.center,midpts[i]);
-	//Normalize vectors
-	Vec2i normalizedVectors[3];
-	for(unsigned i = 0; i < 3; i++)
-	  normalizedVectors[i] = tools.normalize(vectors[i]);
+    else if(intersectPoints.size() >= 3)
+     {
+	vector<Point> midpts;
+	vector<Vec2i> vectors;
+	vector<Vec2i> normalizedVectors;
+	unsigned s = intersectPoints.size();
 
-	for(unsigned i = 0; i < intersectPoints.size(); i++)
-	  {
+	//find midpts
+	for(unsigned i = 0; i < s; i++)
+	 	midpts.push_back(tools.findMidPoint(intersectPoints[i],intersectPoints[(i + 1) % s]));
+	//find vectors
+	for(unsigned i = 0; i < s; i++)
+	  vectors.push_back(tools.makeVector(myCircle.center,midpts[i]));
+	//Normalize vectors
+	for(unsigned i = 0; i < s; i++)
+	  normalizedVectors.push_back(tools.normalize(vectors[i]));
+
+	for(unsigned i = 0; i < s; i++)
+	 {
 	    Point tempPt = midpts[i];
 	    bool validPt = false;
 	    while(!validPt)
 	      {
-		if(tools.isInsideAndNotOn(tempPt,shapes)
+		if(tools.isInsideAndNotOn(tempPt,newShape)
 		   && !tools.isInside (tempPt,myCircle.shape))
 		  {
 		    validPt = true;
-		    stack.push_back(Point(tempPt.x,tempPt.y));
+		    que.push(Point(tempPt.x,tempPt.y));
 		  }
 		//I suppose this could potentially fail if Your somehow end up always in the circle and not on the shape.
 		//Karnaugh Map representation of this gives us the output.
-		else if(!tools.isOn(tempPt,shapes) && tools.isInside(tempPt,myCircle.shape))
+                //We make sure normalized vectors does not have a vector of {0,0}
+		else if(!tools.isOn(tempPt,newShape) && tools.isInside(tempPt,myCircle.shape))
 		  {
+                    
 		    double x = tempPt.x + normalizedVectors[i][0];
 		    double y = tempPt.y + normalizedVectors[i][1];
 		  
 		    tempPt = Point(x,y);
+                    if(normalizedVectors[i][0] == 0 && normalizedVectors[i][1] == 0)
+                        validPt = true;
 		  }
 		else
 		  {
@@ -362,53 +370,17 @@ void MyFeatureDetector::drawCircle()
 		  }
 	      }  
 	  }
-	temp.copyTo(shapes);
-	imshow("shapes",shapes);
-	waitKey(0);
       }
-  }
-  
-  
-  // for(unsigned i = 0; i < queue.size() && queue.size() > 0; i++)
-  //   {
-  //     circle(shapes,queue[i],20,Scalar(255,255,255),2,8);
-  //   }
- 
-  //queue holds the points that we are gonna run insertCircle on
-  //1.insertCircle
-  //2.findIntercepts
-  //3.find midpts
-  //4.find vectors
-  //5.find new pts to add to queue
-  //6.repeat for the other points in the queue
     
-  //queue.push_back();
+    newShape = newShape + myCircle.shape;
+    for(unsigned i = 0; i < que.size(); i++)
+        circle(circlestoadd, que.front(), 10, Scalar(255,255,255), -1, 8);
+    circlestoadd = shapes + circlestoadd;
 
-  //all you really wanna do is do the insertCircle function on the unifies drawing with the correct seed point
-  //if you can do that then this is a piece of cake.
-  
-  //For testing												//
-  // //////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // for(unsigned i = 0; i < intersectPoints.size(); i++)							//
-  //   {													//
-  //     circle(shapes,intersectPoints[i],20,Scalar(255,255,255),2,8);					//
-  //   }													//
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  //For testing	
-  //IF you want to see the circle, the shape, and the Union of the two. Otherwise these lines are uneeded really.
-	
-
-  // imshow("circle", myCircle.shape);									//
-  // //
-
-  // imshow("shape", shapes);										//
-  // //
-  // Mat circleUshapes = myCircle.shape + shapes;								//
-
-  // imshow("circle U shapes", circleUshapes);								//
-  // //
-  // waitKey(0);
+    imshow("circles to add", circlestoadd);
+    imshow("shapes",newShape);
+    waitKey(0);
+  }
 }
 
 vector<Point> MyFeatureDetector::addCircle(int setid, int cid, vector<Point> pointSet)

@@ -5,14 +5,14 @@ TESTING = test
 CXX ?= g++
 DEBUG = -g
 
-CXXFLAGS += -c -Wall $(shell pkg-config --cflags opencv)
+CXXFLAGS += -g -c -Wall $(shell pkg-config --cflags opencv)
 LDFLAGS += $(shell pkg-config --libs --static opencv)
 
 all: executable test
 
-executable: $(OBJECTS); $(CXX) $(OBJECTS) -o $(PROGRAM) $(LDFLAGS)
+executable: $(OBJECTS); $(CXX) $(OBJECTS) -g -o $(PROGRAM) $(LDFLAGS)
 
-test: $(TESTINGOBJECTS); $(CXX) $(TESTINGOBJECTS) -o $(TESTING) $(LDFLAGS)
+test: $(TESTINGOBJECTS); $(CXX) $(TESTINGOBJECTS) -g -o $(TESTING) $(LDFLAGS)
 
 
 # mCenek's code for compiling multiple files at the same time

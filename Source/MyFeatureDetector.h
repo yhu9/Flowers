@@ -5,6 +5,7 @@
 #include "opencv2/core.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
+#include <queue>
 #include <stdlib.h>
 #include "MyTools.h"
 

@@ -772,7 +772,11 @@ bool MyTools::isInside(Point pt, Mat img)
 }
 
 Vec2d MyTools::normalize(Vec2i vector)
-{
+{  
+        if(vector[0] == 0 && vector[1] == 0)
+        {
+            return vector;
+        }
 	Vec2d normalizedVector;
 	double length = sqrt(vector[0] * vector[0] + vector[1] * vector[1]);
 	normalizedVector[0] = vector[0]/length;
@@ -783,11 +787,13 @@ Vec2d MyTools::normalize(Vec2i vector)
 
 bool MyTools::isOn(Point pt, Mat img)
 {
+	//if(pt.x < 0 || pt.y < 0){
+	//	return false;
+	//	cout << "invalid pt gotten" << endl;
+	//}
 	Scalar intensity = img.at<uchar>(pt);
 
-	return (intensity.val[0] == 255 
-			|| intensity.val[1] == 255 
-			|| intensity.val[2] == 255);
+	return (intensity.val[0] == 255);
 
 }
 
