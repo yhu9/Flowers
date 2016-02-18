@@ -246,7 +246,7 @@ Circle MyFeatureDetector::insertCircle(Mat shape, Point seed)
         do
         {
             circle_img = Mat::zeros(shape.size(),CV_8U);
-            circle(circle_img,seed,radius,Scalar(255,255,255),2,8);
+            circle(circle_img,seed,radius,Scalar(255,255,255),3,8);
 
             radius++;
             t = tools.doesIntersect(shape, circle_img);
@@ -266,7 +266,7 @@ Circle MyFeatureDetector::insertCircle(Mat shape, Point seed)
     myCircle.center = seed;
     myCircle.radius = radius;
     myCircle.shape = Mat::zeros(shape.size(), CV_8U);
-    circle(myCircle.shape,seed,radius,Scalar(255,255,255),2,8);
+    circle(myCircle.shape,seed,radius,Scalar(255,255,255),3,8);
 
     return myCircle;
 }
@@ -294,12 +294,31 @@ void MyFeatureDetector::drawCircle()
     namedWindow("circles to add", CV_WINDOW_FREERATIO);     
     Mat circlestoadd = Mat::zeros(shapes.size(), CV_8U);
     Mat newShape = Mat::zeros(shapes.size(),CV_8U);
-    newShape = shapes | shapes;
+    newShape = shapes | newShape;
 
     Point seed = tools.findCentroid(pSet);
     queue<Point> que;
     que.push(seed);
     int t = 1;
+
+    Vec2d vec1 = Vec2d(1,0);
+    Vec2d vec2 = Vec2d(0,1);
+    Vec2d vec3 = Vec2d(-1,0);
+    Vec2d vec4 = Vec2d(0,-1);
+    Vec2d vec5 = Vec2d(1,1);
+    Vec2d vec6 = Vec2d(-1,-1);
+    Vec2d vec7 = Vec2d(-1,1);
+    Vec2d vec8 = Vec2d(1,-1);
+    
+    vector<Vec2d> normalizedVectors;
+    normalizedVectors.push_back(vec1);
+    normalizedVectors.push_back(vec2);
+    normalizedVectors.push_back(vec3);
+    normalizedVectors.push_back(vec4);
+    normalizedVectors.push_back(vec5);
+    normalizedVectors.push_back(vec6);
+    normalizedVectors.push_back(vec7);
+    normalizedVectors.push_back(vec8);
     while(que.size() > 0){
         //Pop one from que
         Point pt = que.front();
@@ -319,21 +338,23 @@ void MyFeatureDetector::drawCircle()
         cout << "myCircle: " << myCircle.radius << endl;
         cout << "number of intersections: " << intersectPoints.size() << endl;
         cout << "circles size: " << circles.size() << endl;
-
+        
+        //Make sure your circle isn't inside any of the old circles you found already.
         bool isInsideCircles = false;
         for(unsigned j = 0; j < circles.size(); j++)
         {
-            if((j != circles.size() - 1) && tools.isInside(myCircle.center,circles[j].shape))
-            {
+            if(tools.isInside(myCircle.center,circles[j].shape))
                 isInsideCircles = true;
-            }
         }
 
+        bool isOutsideShape = false;
+        if(myCircle.center.x > shapes.cols || myCircle.center.y > shapes.rows)
+            isOutsideShape = true;
         //Finding a circle that can be inserted with 3 or more intersections is the criteria of acceptance for the insertion
         //of a circle into the shape. The circle will be inside the shape && notOn newShape
         //new circles to be accepted cannot be inside any of the accepted circles.
-        if(intersectPoints.size() < 3 || isInsideCircles == true)
-            cout << "found less than 3 intersections or is inside one of the other circles." << endl;
+        if(intersectPoints.size() < 3 || isInsideCircles == true || isOutsideShape == true)
+            cout << "found less than 3 intersections or is inside one of the other circles or is Outside shape." << endl;
         else if(intersectPoints.size() >= 3)
         {
             cout << "circle accepted" << endl;
@@ -341,60 +362,15 @@ void MyFeatureDetector::drawCircle()
             circles.push_back(copy);
             //If everything goes well we update newShape
             newShape = newShape + myCircle.shape;
-            //vector<Point> midpts;
-            //vector<Vec2i> vectors;
-            vector<Vec2i> normalizedVectors;
-            //unsigned s = intersectPoints.size();
-
-            Vec2i vec1 = Vec2i(1,0);
-            Vec2i vec2 = Vec2i(0,1);
-            Vec2i vec3 = Vec2i(-1,0);
-            Vec2i vec4 = Vec2i(0,-1);
-            Vec2i vec5 = Vec2i(1,1);
-            Vec2i vec6 = Vec2i(-1,-1);
-            Vec2i vec7 = Vec2i(-1,1);
-            Vec2i vec8 = Vec2i(1,-1);
-
-            normalizedVectors.push_back(vec1);
-            normalizedVectors.push_back(vec2);
-            normalizedVectors.push_back(vec3);
-            normalizedVectors.push_back(vec4);
-            normalizedVectors.push_back(vec5);
-            normalizedVectors.push_back(vec6);
-            normalizedVectors.push_back(vec7);
-            normalizedVectors.push_back(vec8);
-
+            
             unsigned m = normalizedVectors.size();
-            //find midpts
-
-            // if(intersectPoints.size() < 10)
-            // {
-            // 	for(unsigned i = 0; i < s; i++)
-            //             for(unsigned j = 0; j < s; j++)
-            //         {
-            //                 if(i != j)
-            //                  midpts.push_back(tools.findMidPoint(intersectPoints[i],intersectPoints[j]));
-            //         }
-            // }
-            // else
-            //     for(unsigned i = 0; i < s; i++)
-            //     {
-            //         midpts.push_back(tools.findMidPoint(intersectPoints[i],intersectPoints[(i + 1) % s]));
-            //     }
-            // //find vectors
-            // unsigned m = midpts.size();
-            // for(unsigned i = 0; i < m; i++)
-            //   vectors.push_back(tools.makeVector(myCircle.center,midpts[i]));
-            // //Normalize vectors
-            // for(unsigned i = 0; i < m; i++)
-            //   normalizedVectors.push_back(tools.normalize(vectors[i]));
 
             for(unsigned i = 0; i < m; i++)
             {
                 Point tempPt = myCircle.center;
                 bool exitLoop = false;
                 while(!exitLoop)
-                {
+                           {
                     //isInside(shapes && !isOn(newShape) && !isInside(circles)
                     if(tools.isInside(tempPt,shapes)
                             && !tools.isOn(tempPt,newShape)
@@ -418,6 +394,7 @@ void MyFeatureDetector::drawCircle()
                     }
                     else
                     {
+                        que.push(Point(tempPt.x,tempPt.y));
                         exitLoop = true;
                         //exit loop without adding anything to Queue
                     }

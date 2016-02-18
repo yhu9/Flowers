@@ -6,7 +6,7 @@ using namespace std;
 int main()
 {
 	MyFeatureDetector* myDetector = new MyFeatureDetector();
-	myDetector->init("Flowers/Shape1/shape1-001.ppm");
+	myDetector->init("Flowers/Shape1/shape1-000.ppm");
 	myDetector->drawCircle();
 	//myDetector->test("FILE NAME");
 
