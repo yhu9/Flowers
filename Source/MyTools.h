@@ -48,7 +48,8 @@ public:
 	bool findPtInShape(Point,vector<Point>);	//does not work
 	bool doesIntersect(Mat img1, Mat img2);		//checks to see if img1 and img2 intersect
 	bool isInside(Point pt, Mat img);		//checks to see if pt is inside img
-	bool isOn(Point pt, Mat img);			//checks to see if pt is on img
+	bool isInside2(Point pt, Mat img);
+        bool isOn(Point pt, Mat img);			//checks to see if pt is on img
 	bool isInsideAndNotOn(Point pt, Mat img);		//checks to see if pt is inside and Not on img
 	vector<Point> findIntersections(Mat img1, Mat img2);	//finds the intersections of img1 and img2
 	
@@ -81,5 +82,5 @@ public:
 	
 	//Complex image processing tools
 	Point jitterCircle(Point c, double radius, Mat shape);
-
+        Point jitterCircle(Point c, double radius, Point c2, double radius2, Mat shape);
 };

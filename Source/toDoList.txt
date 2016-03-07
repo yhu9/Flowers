@@ -1,0 +1,5 @@
+This is a to-do list of features that I am procrastinating to do.
+
+-Separate the tools class to multiple classes
+-The insert Circle() function will run forever if the image is blank... maybe you should fix this huh.
+-Make test cases to prove your functions still work in the testall.cpp file.

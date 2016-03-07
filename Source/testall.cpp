@@ -5,7 +5,7 @@
 using namespace std;
 using namespace cv;
 
-class testingClass
+class TestingClass
 {
 private:
   MyFeatureDetector* testObjectMyFeatureDetector;
@@ -14,13 +14,13 @@ private:
   MyTools* testObjectMyTools;
 
 public:
-  testingClass(){
+  TestingClass(){
     testObjectMyFeatureDetector = new MyFeatureDetector();
     testObjectNode = new Node();
     testObjectCircle = new Circle();
     testObjectMyTools = new MyTools();
   }
-  ~testingClass(){
+  ~TestingClass(){
     delete testObjectMyFeatureDetector;
     delete testObjectNode;
     delete testObjectCircle;
@@ -86,7 +86,7 @@ public:
   bool testFindSlope(){return false;}
   bool testFindPointID(){return false;}
   bool testFindCentroid(){return false;}
-  bool testFindInterSections(){
+  bool testFindIntersections(){
     Mat circle1 = Mat::zeros(500,500,CV_8U);
     Mat circle2 = Mat::zeros(500,500,CV_8U);
 
@@ -142,12 +142,100 @@ int main()
   Node* testNodeClass = new Node();
   Circle* testCircleClass = new Circle();
   MyTools* testMyToolsClass = new MyTools();
-
+  TestingClass tester = TestingClass();
+  
   //test MyFeatureDetector Class
   testMyFeatureDetectorClass->init("Flowers/testForMasa.png");
-  //testMyFeatureDetectorClass->drawCircle();
+  
+  //bool test1 = tester.testFindIntersections();
+  //cout << "findIntersections(): " << test1 << endl;
+
+  Mat triangle = Mat::zeros(500,500,CV_8U);
+  Mat image = Mat::zeros(500,500,CV_8U);
+
+  Point pt1 = Point(0,20); Point pt2 = Point(500,20); Point pt3 = Point(250,500);
+  line(triangle, pt1, pt2, Scalar(255,255,255), 1, 8);
+  line(triangle, pt2,pt3,Scalar(255,255,255), 1, 8);
+  line(triangle,pt3,pt1,Scalar(255,255,255),1,8);
+
+  Circle testCircle = testMyFeatureDetectorClass->insertCircle(triangle, Point(250,250));
+  //push intersections found between shape and circle into a set  
+  vector<Point> intersections = testMyToolsClass->findIntersections(triangle, testCircle.shape);
+  
+  for(unsigned i = 0; i < intersections.size(); i++)
+      circle(image, intersections[i], 10, Scalar(255,255,255), 1, 8);
+
+  //push angles of the ray created between the center of the circle and the intersections into set radii
+  vector<double> radii;
+  for(unsigned i = 0; i < intersections.size(); i++)
+  {
+      radii.push_back(testMyToolsClass->findAngleOfRay(testCircle.center, intersections[i]));
+      radii[i] = ((int)radii[i] + 360) % 360;
+  }
+
+  cout << intersections.size() << endl;
+  //sort set radii
+  sort(radii.begin(), radii.end());
+
+  image = triangle | image | testCircle.shape;
+  imshow("image", image);
+  waitKey(0);
+  vector<Point> seeds;
+  for(unsigned i = 0; i < radii.size(); i++)
+  {
+      int j = (i + 1) % (int)radii.size();
+
+      double theta = (radii[i] / 180) * 3.141592653;
+      double x = testCircle.radius * cos(theta) + testCircle.center.x;
+      double y = testCircle.radius * sin(theta) + testCircle.center.y;
+      Point pt = Point(x,y);
+
+      double theta2 = (radii[j]/180) * 3.141592653;
+      x = testCircle.radius * cos(theta2) + testCircle.center.x;
+      y = testCircle.radius * sin(theta2) + testCircle.center.y;
+      Point pt2 = Point(x,y);
+
+      Mat img = Mat::zeros(triangle.size(), CV_8U);
+      line(img, testCircle.center, pt, Scalar(255,255,255), 1,8);
+      line(img, testCircle.center, pt2, Scalar(255,255,255), 1, 8);
+      img = img | triangle | testCircle.shape;
+      imshow("rand seeds", img);
+      waitKey(0);
+
+      line(image,testCircle.center,pt,Scalar(255,255,255),2,8);
+        cout << "radii[i]: " << radii[i] << endl;
+
+      theta = radii[i] + 1 + (rand() % (int)(radii[j] - radii[i] - 1));
+      theta = theta * 3.141592653 / 180;
+      x = testCircle.radius * cos(theta) + testCircle.center.x;
+      y = testCircle.radius * sin(theta) + testCircle.center.y;
+      pt = Point(x,y);
+
+      circle(img, pt, 30, Scalar(255,255,255), -1, 8);
+      imshow("rand seeds", img);
+      waitKey(0);
+
+      seeds.push_back(pt);
+  }
+  
+  for(unsigned i = 0; i < seeds.size(); i++)
+    {
+      circle(image, seeds[i], 10, Scalar(255,255,255), -1, 8);
+    }
+  cout << "seeds.size(): " << seeds.size() << endl;
+
+  Circle c = testMyFeatureDetectorClass->insertCircle2(triangle, testCircle, seeds[0]);
+
+  //have a direction to grow and a seed
+  //turns out a normalized vector always has a length of 1! Lucky lucky
+  //we take advantage of that and the fact that the growth of the circle will always be in the direction of the intersection from 
+  //the first circle.
+  
   
 
+  image = (triangle | testCircle.shape) | image;
+  namedWindow("image", CV_WINDOW_FREERATIO);
+  imshow("image", image);
   waitKey(0);
 
   testMyFeatureDetectorClass->exit();

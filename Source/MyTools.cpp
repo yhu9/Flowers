@@ -86,20 +86,20 @@ double MyTools::findDistance(Point v1, Point v2)
     distance = sqrt(pow((double)(v2.x - v1.x), 2) + pow((double)v2.y - (double)v1.y,2));
     return distance;
 }
+//returns the euclidean direction of the ray in degrees
+//uses functions findDistance()
+//Math.h
 double MyTools::findAngleOfRay(Point start, Point end)
 {
-    //cout << "MyTools::findAngleOfRay" << endl;
     double theta = 0;
-    if(end.x == start.x)
-        return theta;
-    else
-        theta = atan((double)(end.y - start.y) / (double)(end.x - start.x));
+    
+    theta = atan2(end.y - start.y, end.x - start.x);
+    theta = (180 * theta) / 3.141592653;
 
     return theta;
 }
 Vec2i MyTools::makeVector(Point start,Point end)
 {
-    //cout << "MyTools::findDirectionOfRay" << endl;
     Vec2i vec(end.x - start.x, end.y - start.y);
     return vec;
 }
@@ -441,7 +441,6 @@ void MyTools::subtractionOfPoints(vector<Point> set1,vector<Point> set2, vector<
 }
 bool MyTools::doesIntersect(Mat img1, Mat img2)
 {
-    ////cout << "MyTools:doesIntersect" << endl;
     //Should later make sure that all image types are of type CV_8U to make the comparison
     Mat img3;
     img3 = Mat::zeros(img1.size().width,img1.size().height,CV_8U);
@@ -449,19 +448,6 @@ bool MyTools::doesIntersect(Mat img1, Mat img2)
 
     Point minpt, maxpt;
     minMaxLoc(img3,NULL,NULL,&minpt,&maxpt);
-
-    //Draws the intersection of img1 and img2 on img3 and if it finds
-    //a bright spot we say there is an intersection.
-
-    //namedWindow("img1",CV_WINDOW_FREERATIO);
-    //namedWindow("img2",CV_WINDOW_FREERATIO);
-    //namedWindow("img3",CV_WINDOW_FREERATIO);
-
-    //imshow("img1",img1);
-    //imshow("img2",img2);
-    //imshow("img3",img3);
-
-    //waitKey();
 
     if(minpt.x == maxpt.x && minpt.y == maxpt.y)
         return false;
@@ -476,14 +462,11 @@ Point MyTools::jitterCircle(Point c, double radius, Mat shape)
     int x = c.x;
     int y = c.y;
     circle_img = Mat::zeros(shape.size(),CV_8U);
-    //imshow("",shape);
-    //waitKey();
 
-    //Trial Number2
     for(double radian = 0; radian < 6.2; radian+=0.1)
     {
-        c.x = x + 5 * cos(radian);
-        c.y = y + 5 * sin(radian);
+        c.x = x + 3 * cos(radian);
+        c.y = y + 3 * sin(radian);
 
         circle(circle_img,c,radius,Scalar(255,255,255),1,8);
         if(doesIntersect(shape,circle_img))
@@ -493,10 +476,6 @@ Point MyTools::jitterCircle(Point c, double radius, Mat shape)
         }
         else
         {
-            //circle(shape,c,radius,Scalar(255,255,255),2,8);
-            //imshow("",shape);
-            //waitKey();
-
             return c;
         }
 
@@ -505,12 +484,62 @@ Point MyTools::jitterCircle(Point c, double radius, Mat shape)
 
     return c;
 }
+
+//Jitters the circle on top of another circle
+Point MyTools::jitterCircle(Point c, double radius, Point c2, double radius2, Mat shape)
+{
+    double theta = findAngleOfRay(c,c2);
+    Mat circle_img = Mat::zeros(shape.size(), CV_8U);
+
+    //Mat img = Mat::zeros(shape.size(), CV_8U);
+    //circle(img, c, radius, Scalar(255,255,255), 1, 8);
+    //img = img | shape;
+
+    for(int i = 0; i < 6; i++)
+    {
+        
+        double radians = theta / 180 * 3.141592653;
+        if(i == 0)
+            radians += 0.02;
+        else if(i == 1)
+            radians -= 0.02;
+        else if(i == 2)
+            radians += 0.04;
+        else if(i == 3)
+            radians -= 0.04;
+        else if(i == 4)
+            radians += 0.1;
+        else if(i == 5)
+            radians -= 0.1;
+
+        double x2 = (radius + radius2) * cos(radians) + c.x;
+        double y2 = (radius + radius2) * sin(radians) + c.y;
+        Point pt = Point(x2,y2);
+
+        //line(img, pt, c, Scalar(255,255,255), 2, 8);
+        //line(img, pt, c2, Scalar(255,255,255), 2, 8);
+        //imshow("",img);
+        //waitKey(0);
+        circle(circle_img, pt, radius2, Scalar(255,255,255), 1, 8);
+        if(doesIntersect(shape,circle_img))
+                ; 
+        else
+            return pt;
+
+        circle_img = Mat::zeros(shape.size(), CV_8U);
+    }
+
+    return c2;
+}
+
+//We should really make the destruction size to be some ratio of the image size.
 vector<Point> MyTools::findIntersections(Mat img1, Mat img2)
 {
     vector<Point> intersectPoints;
     Mat intersection;
     intersection = Mat::zeros(img1.size(),CV_8U);
     intersection = img1 & img2;
+
     Point minpt, maxpt;
 
     do
@@ -519,9 +548,9 @@ vector<Point> MyTools::findIntersections(Mat img1, Mat img2)
         if(minpt.x != maxpt.x && minpt.y != maxpt.y)
             intersectPoints.push_back(maxpt);
 
-        circle(intersection, maxpt,30,Scalar(0,0,0),-1,8);
+        circle(intersection, maxpt,10,Scalar(0,0,0),-1,8);
 
-    }while(minpt.x != maxpt.x && minpt.y != maxpt.y);
+    }while(!(minpt.x == maxpt.x && minpt.y == maxpt.y));
 
     //If no intersect points are found then an empty set is returned
     return intersectPoints;
@@ -778,6 +807,21 @@ bool MyTools::isInside(Point pt, Mat img)
     }
 
     return trueCount >= falseCount;
+}
+
+bool MyTools::isInside2(Point pt, Mat img)
+{
+    Mat temp;
+
+    Point testPts[8] = {Point(pt.x,0),Point(pt.x,img.rows),Point(0,pt.y), Point(img.cols,pt.y), Point(img.cols,img.rows), Point(img.cols,0),Point(0,img.rows),Point(0,0)};
+    for(int i = 0; i < 8; i++)
+    {
+        temp = Mat::zeros(img.size(), CV_8U);
+        line(temp, pt, testPts[i], Scalar(255,255,255), 1, 8);
+        if(!doesIntersect(temp, img))
+            return false;
+    }
+    return true;
 }
 
 Vec2d MyTools::normalize(Vec2i vector)
