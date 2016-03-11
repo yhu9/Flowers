@@ -618,6 +618,54 @@ vector< vector<Point> > MyTools::removeOutliers(vector<vector<Point> > contour)
 
     return contour;
 }
+vector<Point> MyTools::reduction(vector<Point> setIn, int reductionSize)
+{
+    vector<int> setid;
+    vector<Point> set;
+    Mat drawing;
+
+    for(unsigned i = 0; i< setIn.size(); i++)
+    {
+        set.push_back(Point(setIn[i].x,setIn[i].y));
+    }
+
+    int x, y, count;
+    for(unsigned i = 0; i < set.size(); i++)
+    {
+        x = 0; y = 0; count = 0;
+        for(unsigned j = 0; j < set.size(); j++)
+        {
+        if(i != j)
+            if(findDistance(set[i],set[j]) < reductionSize)
+            {
+                count++;
+                x+= set[j].x;
+                y += set[j].y;
+                setid.push_back(j);
+            }
+        }
+        
+        if(count >= 4)
+        {
+            sort(setid.begin(),setid.end());
+            for(unsigned a = setid.size(); a > 0; a--)
+            {
+                if((unsigned)setid[a - 1] >= set.size())
+                {
+                }
+                else
+                {
+                    set.erase(set.begin() + setid[a - 1]);
+                }
+            }
+            x = x / count;
+            y = y / count;
+            set.push_back(Point(x,y));
+            setid.clear();
+        }
+    }
+    return set;
+}
 vector<Point*> MyTools::reduction(vector<Point*> set, int reductionSize)
 {
     //cout << "MyTools::reduction" << endl;

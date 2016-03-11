@@ -58,7 +58,8 @@ public:
 	void closeOpenContours(Mat,vector<vector<Point> >);
 	vector<vector<Point> > removeOutliers(vector<vector<Point> >);
 	vector<Point*> reduction(vector<Point*> set, int reductionSize);
-	void closeImageDijkstra(vector<Node*> map, Mat img);
+	vector<Point> reduction(vector<Point> set, int reductionSize);
+        void closeImageDijkstra(vector<Node*> map, Mat img);
 	void closeImage(vector<Node*> map, Mat img);
 
 	//Map Functions

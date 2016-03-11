@@ -169,7 +169,7 @@ void MyFeatureDetector::init(char* imgname)
         //if you'd like you can show the basic images we created
         namedWindow("drawing",CV_WINDOW_FREERATIO);
         imshow("drawing",drawing);
-        waitKey(0);
+        waitKey(1);
         //namedWindow("reducedImage",CV_WINDOW_FREERATIO);
         //imshow("reducedImage",reducedImage);
 
@@ -293,6 +293,7 @@ Circle MyFeatureDetector::insertCircle2(Mat shape, Circle prev, Point seed)
         //find the new seed pt by where the vector intersects the circle
         Mat tempLine = Mat::zeros(shape.size(), CV_8U);
         Mat tempCircle = Mat::zeros(shape.size(), CV_8U);
+        //Point tempPt = Point(new_center_pt.x + vec1[0] * 10, new_center_pt + vec1[1] * 10);
         line(tempLine, prev.center, new_center_pt, Scalar(255,255,255), 1, 8);
         circle(tempCircle, prev.center, prev.radius, Scalar(255,255,255), 2, 8);
         vector<Point> newSeedPt = tools.findIntersections(tempLine,tempCircle);
@@ -326,7 +327,7 @@ Circle MyFeatureDetector::insertCircle2(Mat shape, Circle prev, Point seed)
             Mat temp = Mat::zeros(shape.size(), CV_8U);
             temp = circle_img | shape | prev.shape;
             imshow("circle img", temp);
-            waitKey(10);
+            waitKey(1);
             //////////////////////////////////////////////////////////////////////
         }
 
@@ -522,7 +523,9 @@ void MyFeatureDetector::drawCircle2()
     {
         Circle myCircle = que.front();
         que.pop_front();
-        vector<Point> intersections = tools.findIntersections(myCircle.shape, newShape);
+        Mat myCircle_shape = Mat::zeros(newShape.size(), CV_8U);
+        circle(myCircle_shape, myCircle.center, myCircle.radius, Scalar(255,255,255), 1,8);
+        vector<Point> intersections = tools.findIntersections(myCircle_shape, newShape);
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
         //cout << "intersection.size(): " << intersections.size() << endl;
@@ -531,8 +534,18 @@ void MyFeatureDetector::drawCircle2()
         //imshow("my circle", my_circle);
         //waitKey(0);
         ////////////////////////////////////////////////////////////////////////////////////////////////
+        //
+        
 
-        if(intersections.size() > 1)
+        //if(intersections.size() > 5)
+        //{
+        //    intersections = tools.reduction(intersections, 30);
+
+        //}
+
+        cout << "intersection.size(): " << intersections.size() << endl;
+        //double check to be sure next circle is not on the newShape at all
+        if(intersections.size() > 1 && !tools.isOn(myCircle.center, newShape))
         {
             circles.push_back(myCircle);
             vector<double> radii;
@@ -567,10 +580,12 @@ void MyFeatureDetector::drawCircle2()
             }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
-            //for(unsigned i = 0; i < seeds.size(); i++)
-            //   circle(my_circle, seeds[i], 5, Scalar(255,255,255), -1, 8); 
-            //imshow("my circle", my_circle);
-            //waitKey(0);
+            Mat my_circle = Mat::zeros(newShape.size(), CV_8U);
+            my_circle = newShape | my_circle | myCircle.shape;
+            for(unsigned i = 0; i < seeds.size(); i++)
+               circle(my_circle, seeds[i], 5, Scalar(255,255,255), -1, 8); 
+            imshow("my circle", my_circle);
+            waitKey(1);
         ////////////////////////////////////////////////////////////////////////////////////////////////
 
             //while seeds > 0 pop a seed from the set and grow a circle from there.
@@ -611,7 +626,7 @@ void MyFeatureDetector::drawCircle2()
                 circlesInQue = circlesInQue | que[i].shape;
             namedWindow("circles in que", CV_WINDOW_FREERATIO);
             imshow("circles in que", circlesInQue);
-            waitKey(20);
+            waitKey(1);
             /////////////////////////////////////////////////////////////////////////////////////////
 
             cout << "circles.size(): " << circles.size() << endl;
