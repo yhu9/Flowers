@@ -76,6 +76,7 @@ void MyFeatureDetector::init(char* imgname)
     {
 
         shapes = imread(imgname,CV_8U);
+        Mat hull_shape = Mat::zeros(shapes.size(), CV_8U);
         Mat detectedEdges = Mat::zeros(shapes.size(), CV_8U);
         Mat drawing = Mat::zeros(shapes.size(),CV_8U);
         Mat reducedImage = Mat::zeros(shapes.size(),CV_8U);
@@ -106,22 +107,37 @@ void MyFeatureDetector::init(char* imgname)
         //Finds contours of the image
         //Basically verticies that are next to each other.
         //And draws it onto a drawing board with blue coloring
+       
+    //CV_RETR_EXTERNAL retrieves only the extreme outer contours. It sets hierarchy[i][2]=hierarchy[i][3]=-1 for all the contours.
+    //CV_RETR_LIST retrieves all of the contours without establishing any hierarchical relationships.
+    //CV_RETR_CCOMP retrieves all of the contours and organizes them into a two-level hierarchy. At the top level, there are external boundaries of the components. At the second level, there are boundaries of the holes. If there is another contour inside a hole of a connected component, it is still put at the top level.
+    //CV_RETR_TREE retrieves all of the contours and reconstructs a full hierarchy of nested contours. This full hierarchy is built and shown in the OpenCV contours.c demo.
+    //CV_CHAIN_APPROX_NONE stores absolutely all the contour points. That is, any 2 subsequent points (x1,y1) and (x2,y2) of the contour will be either horizontal, vertical or diagonal neighbors, that is, max(abs(x1-x2),abs(y2-y1))==1.
+    //CV_CHAIN_APPROX_SIMPLE compresses horizontal, vertical, and diagonal segments and leaves only their end points. For example, an up-right rectangular contour is encoded with 4 points.
+    //CV_CHAIN_APPROX_TC89_L1,CV_CHAIN_APPROX_TC89_KCOS applies one of the flavors of the Teh-Chin chain approximation algorithm. See [TehChin89] for details.
+
+//offset – Optional offset by which every contour point is shifted. This is useful if the contours are extracted from the image ROI and then they should be analyzed in the whole  
         findContours(detectedEdges,contours,heirarchy,CV_RETR_LIST,CV_CHAIN_APPROX_SIMPLE,Point());
         cout << "contours found" << endl;
 
-        contours = tools.removeOutliers(contours);
+        
 
-        contourSet = contours;
+        //remove outliers
+        contours = tools.removeOutliers(contours);
 
         //Draw contour on drawing
         for(unsigned i = 0; i < contours.size(); i++)
             drawContours(drawing,contours,i,Scalar(255,255,255),0,8,heirarchy,0,Point());
 
         //Store contours created in previous step in pSet of class
+        vector<Point> temp;
         for(unsigned i = 0; i < contours.size(); i++)
         {
             for(unsigned j = 0; j < contours[i].size(); j++)
+            {
+                temp.push_back(Point(contours[i][j]));
                 pSet.push_back(new Point(contours[i][j]));
+            }
         }
 
         //Reduce the set size of pSet or else we may end up with too many points in the set
@@ -158,6 +174,23 @@ void MyFeatureDetector::init(char* imgname)
         //Close the shape
         tools.closeImage(maps,reducedImage);
 
+        //enclose the shape with a circle.
+        Mat bCircle = Mat::zeros(drawing.size(), CV_8U);
+        //for(int i = 0; i < (int)contours.size(); i++)
+        //        drawContours(hull_temp,hull, i, Scalar(255,255,255), 2, 8, vector<Vec4i>(), 0, Point());
+
+        Point2f center = Point2f(0,0);
+        float radius = 0;
+        //for(int i = 0; i < (int)contours.size(); i++)
+            minEnclosingCircle(temp,center,radius);
+        circle(bCircle, center, radius, Scalar(255,255,255), 2, 8);
+
+        //enclose the shape with a rectangle.
+        Mat rec_temp = Mat::zeros(drawing.size(),CV_8U);
+        Rect bRect;
+        //for(int i = 0; i < (int)contours.size(); i++)
+            bRect = boundingRect(temp);
+        rectangle(rec_temp, bRect.tl(), bRect.br(), Scalar(255,255,255), 2, 8);
         //tools contain the functions made by Masa Hu
         ////////////////////////////////////
         //////////////////////////////
@@ -165,6 +198,8 @@ void MyFeatureDetector::init(char* imgname)
 
         contourSet = contours;
         shapes = reducedImage;
+        boundCircle = bCircle;
+        boundRect = rec_temp;
 
         //if you'd like you can show the basic images we created
         namedWindow("drawing",CV_WINDOW_FREERATIO);
@@ -293,9 +328,8 @@ Circle MyFeatureDetector::insertCircle2(Mat shape, Circle prev, Point seed)
         //find the new seed pt by where the vector intersects the circle
         Mat tempLine = Mat::zeros(shape.size(), CV_8U);
         Mat tempCircle = Mat::zeros(shape.size(), CV_8U);
-        //Point tempPt = Point(new_center_pt.x + vec1[0] * 10, new_center_pt + vec1[1] * 10);
         line(tempLine, prev.center, new_center_pt, Scalar(255,255,255), 1, 8);
-        circle(tempCircle, prev.center, prev.radius, Scalar(255,255,255), 2, 8);
+        circle(tempCircle, prev.center, prev.radius, Scalar(255,255,255),2, 8);
         vector<Point> newSeedPt = tools.findIntersections(tempLine,tempCircle);
 
         //check if new circle is already at max size
@@ -304,42 +338,47 @@ Circle MyFeatureDetector::insertCircle2(Mat shape, Circle prev, Point seed)
         circle(circle_img, new_center_pt, radius, Scalar(255,255,255), 1, 8);
         touchingShape = tools.doesIntersect(shape, circle_img);
 
-        while(touchingShape == false)
+        if(newSeedPt.size() > 0)
         {
-            count += 1;
-            circle_img = Mat::zeros(shape.size(), CV_8U);
-
-            double x = newSeedPt[0].x + vec1[0] * count;
-            double y = newSeedPt[0].y + vec1[1] * count;
-            new_center_pt = Point(x,y);
-
-            radius = tools.findDistance(new_center_pt, newSeedPt[0]);
-            circle(circle_img, new_center_pt, radius, Scalar(255,255,255),1, 8);
-            touchingShape = tools.doesIntersect(shape, circle_img);
-
-            if(!tools.isInside2(new_center_pt, shapes))
+            while(touchingShape == false)
             {
-                myCircle.radius = -1;
-                return myCircle;
-            }
-            
-            //////////////////////////////////////////////////////////////////////
-            Mat temp = Mat::zeros(shape.size(), CV_8U);
-            temp = circle_img | shape | prev.shape;
-            imshow("circle img", temp);
-            waitKey(1);
-            //////////////////////////////////////////////////////////////////////
-        }
+                count += 1;
+                circle_img = Mat::zeros(shape.size(), CV_8U);
 
-        //find new center of new circle
-        Point temppt = tools.jitterCircle(prev.center, prev.radius, new_center_pt, radius, shape);
-        if(new_center_pt.x == temppt.x && temppt.y == new_center_pt.y)
-        {
-            isLargestCircle = true;
-            radius += 2;
+                double x = newSeedPt[0].x + vec1[0] * count;
+                double y = newSeedPt[0].y + vec1[1] * count;
+                new_center_pt = Point(x,y);
+
+                radius = tools.findDistance(new_center_pt, newSeedPt[0]);
+                circle(circle_img, new_center_pt, radius, Scalar(255,255,255),1, 8);
+                touchingShape = tools.doesIntersect(shape, circle_img);
+
+                if(!tools.isInside2(new_center_pt, shapes))
+                {
+                    myCircle.radius = -1;
+                    return myCircle;
+                }
+
+                //////////////////////////////////////////////////////////////////////
+                Mat temp = Mat::zeros(shape.size(), CV_8U);
+                temp = circle_img | shape | prev.shape;
+                imshow("circle img", temp);
+                waitKey(1);
+                //////////////////////////////////////////////////////////////////////
+            }
+
+            //find new center of new circle
+            Point temppt = tools.jitterCircle(prev.center, prev.radius, new_center_pt, radius, shape);
+            if(new_center_pt.x == temppt.x && temppt.y == new_center_pt.y)
+            {
+                isLargestCircle = true;
+                radius += 2.5;
+            }
+            else
+                new_center_pt = temppt;
         }
         else
-            new_center_pt = temppt;
+            cout << "error, newSeedPt.size() < 1" << endl;
     }
 
     myCircle.center = new_center_pt;
@@ -509,6 +548,14 @@ void MyFeatureDetector::drawCircle()
 //1. the center of the circle is outside of the shape
 //2. if the circle is both inside and outside the shape
 //3. if the circle grows into another circle
+struct fooSortCircle
+{
+    inline bool operator() (const Circle& s1, const Circle& s2)
+    {
+        return (s1.radius > s2.radius);
+    }
+};
+
 void MyFeatureDetector::drawCircle2()
 {
     //namedWindow("my circle", CV_WINDOW_FREERATIO);
@@ -521,6 +568,7 @@ void MyFeatureDetector::drawCircle2()
     que.push_back(firstCircle);
     while(que.size() > 0)
     {
+        sort(que.begin(), que.end(), fooSortCircle());
         Circle myCircle = que.front();
         que.pop_front();
         Mat myCircle_shape = Mat::zeros(newShape.size(), CV_8U);
@@ -535,13 +583,6 @@ void MyFeatureDetector::drawCircle2()
         //waitKey(0);
         ////////////////////////////////////////////////////////////////////////////////////////////////
         //
-        
-
-        //if(intersections.size() > 5)
-        //{
-        //    intersections = tools.reduction(intersections, 30);
-
-        //}
 
         cout << "intersection.size(): " << intersections.size() << endl;
         //double check to be sure next circle is not on the newShape at all
@@ -559,34 +600,52 @@ void MyFeatureDetector::drawCircle2()
             //sort radii after converting everything to positive values
             sort(radii.begin(),radii.end());
 
-            //Find the midpoint of the arcs.
+            //find the averageDegree of radii
+            double averageDegree = 0;
+            for(int i = 0; i < (int)radii.size(); i++)
+            {
+                int j = (i + 1) % (int)radii.size();
+                if(j < i)
+                    averageDegree += abs(radii[j] + 360 - radii[i]);
+                else
+                    averageDegree += abs(radii[j] - radii[i]);
+            }
+            averageDegree = averageDegree / radii.size();
+
+            //Find the midpoint of the arcs. if there are less than 3 arcs or the arcs are greater than the average degree
             vector<Point> seeds;
             for(int i = 0; i < (int)radii.size(); i++)
             {
                 int j = (i + 1) % (int)radii.size();
-                double theta = 0; 
+                double theta = 0;
+                double diff = 0;
                 //if radii[j] < radii[i]
                 if(j < i)
-                    theta = radii[i] + (radii[j] + 360 - radii[i]) / 2;
+                    diff = radii[j] + 360 - radii[i];
                 else
-                    theta = radii[i] + (radii[j] - radii[i]) / 2;
-                //Point to start circle growth from
-                theta = theta /180 * 3.141592653;
-                double x = myCircle.center.x + myCircle.radius * cos(theta);
-                double y = myCircle.center.y + myCircle.radius * sin(theta);
-                Point pt = Point(x,y);
+                    diff = radii[j] - radii[i];
+                if(!(radii.size() > 3 && diff < averageDegree))
+                {
+                    theta = radii[i] + diff / 2;
+                    //Point to start circle growth from
+                    theta = theta /180 * 3.141592653;
+                    double x = myCircle.center.x + myCircle.radius * cos(theta);
+                    double y = myCircle.center.y + myCircle.radius * sin(theta);
+                    Point pt = Point(x,y);
 
-                seeds.push_back(pt);
+                    seeds.push_back(pt);
+                }
             }
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////
-            Mat my_circle = Mat::zeros(newShape.size(), CV_8U);
-            my_circle = newShape | my_circle | myCircle.shape;
-            for(unsigned i = 0; i < seeds.size(); i++)
-               circle(my_circle, seeds[i], 5, Scalar(255,255,255), -1, 8); 
-            imshow("my circle", my_circle);
-            waitKey(1);
-        ////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////
+            //cout << "seeds.size(): " << seeds.size() << endl;
+            //Mat my_circle = Mat::zeros(newShape.size(), CV_8U);
+            //my_circle = newShape | my_circle | myCircle.shape;
+            //for(unsigned i = 0; i < seeds.size(); i++)
+            //    circle(my_circle, seeds[i], 5, Scalar(255,255,255), -1, 8); 
+            //imshow("my circle", my_circle);
+            //waitKey(1);
+            ////////////////////////////////////////////////////////////////////////////////////////////////
 
             //while seeds > 0 pop a seed from the set and grow a circle from there.
             //If the circle is valid push it into the que.
@@ -595,19 +654,19 @@ void MyFeatureDetector::drawCircle2()
                 Point seed = seeds.back();
                 seeds.pop_back();
 
-                    Circle c = insertCircle2(newShape, myCircle, seed);
-                    ////////////////////////////////////////////////////////////////////////////////////////////////
-                    //my_circle = Mat::zeros(my_circle.size(), CV_8U);    
-                    //my_circle = newShape | my_circle;
-                    //circle(my_circle, c.center, c.radius, Scalar(255,255,255), 1, 8);
-                    //imshow("my circle", my_circle);
-                    //    waitKey(0);
-                    ////////////////////////////////////////////////////////////////////////////////////////////////                   
-                    if(c.radius != -1 && c.radius > 5 && c.radius < newShape.cols)
-                    {
-                        if(!tools.isOn(c.center, newShape) && !tools.isOn(c.center, myCircle.shape))
-                            que.push_back(c);
-                    } 
+                Circle c = insertCircle2(newShape, myCircle, seed);
+                ////////////////////////////////////////////////////////////////////////////////////////////////
+                //my_circle = Mat::zeros(my_circle.size(), CV_8U);    
+                //my_circle = newShape | my_circle;
+                //circle(my_circle, c.center, c.radius, Scalar(255,255,255), 1, 8);
+                //imshow("my circle", my_circle);
+                //    waitKey(0);
+                ////////////////////////////////////////////////////////////////////////////////////////////////                   
+                if(c.radius != -1 && c.radius > 2 && c.radius < newShape.cols)
+                {
+                    if(!tools.isOn(c.center, newShape) && !tools.isOn(c.center, myCircle.shape))
+                        que.push_back(c);
+                } 
             }//end while
 
             cout << "que.size(): " << que.size() << endl;
@@ -637,6 +696,7 @@ void MyFeatureDetector::drawCircle2()
 
 void MyFeatureDetector::drawSkeleton(int fudge)
 {
+    Mat newShape = Mat::zeros(shapes.size(), CV_8U);
     for(unsigned i = 0; i < circles.size(); i++)
     {
         for(unsigned j = 0; j < circles.size(); j++)
@@ -645,17 +705,23 @@ void MyFeatureDetector::drawSkeleton(int fudge)
             Mat c2 = Mat::zeros(shapes.size(), CV_8U);
             circle(c1, circles[i].center, circles[i].radius, Scalar(255,255,255), fudge, 8);
             circle(c2, circles[j].center, circles[j].radius, Scalar(255,255,255), fudge, 8);
+            Mat tempLine = Mat::zeros(shapes.size(), CV_8U);
             if(tools.doesIntersect(c1, c2) && i != j)
-                line(shapes, circles[i].center, circles[j].center, Scalar(255,255,255), 2, 8);
+                line(tempLine, circles[i].center, circles[j].center, Scalar(255,255,255), 2, 8);
+
+            if(!tools.doesIntersect(tempLine,shapes))
+                newShape = newShape | tempLine;
         }
         Mat circle_img = Mat::zeros(shapes.size(), CV_8U);
         circle(circle_img, circles[i].center, circles[i].radius, Scalar(255,255,255), 2, 8);
-        shapes = shapes | circle_img;
+        newShape =  newShape | circle_img;
     }
+    shapes = shapes | newShape;
 }
 
 void MyFeatureDetector::showShape()
 {
+    shapes = shapes | boundCircle | boundRect;
     namedWindow("final shape", CV_WINDOW_FREERATIO);
     imshow("final shape", shapes);
     waitKey(0);

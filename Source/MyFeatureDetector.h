@@ -31,6 +31,8 @@ private:
 	vector<Point*> pSet;
 	vector<Node*> maps;
 	Mat shapes;
+        Mat boundCircle;
+        Mat boundRect;
 	vector<int> features;
 	vector<Circle> circles;
 	MyTools tools;

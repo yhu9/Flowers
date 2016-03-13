@@ -6,7 +6,7 @@ using namespace std;
 int main()
 {
 	MyFeatureDetector* myDetector = new MyFeatureDetector();
-	myDetector->init("Flowers/Shape3/shape3-001.ppm");
+	myDetector->init("Flowers/Shape1/shape1-003.ppm");
        	myDetector->drawCircle2();
         myDetector->drawSkeleton(2);
         cout << "final shape" << endl;
