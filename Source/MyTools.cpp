@@ -843,7 +843,7 @@ bool MyTools::isInside(Point pt, Mat img)
     unsigned trueCount = 0;
     Point testPts[8] = {Point(pt.x,0),Point(pt.x,img.rows),Point(0,pt.y), Point(img.cols,pt.y), Point(img.cols,img.rows), Point(img.cols,0),Point(0,img.rows),Point(0,0)};
 
-    for(unsigned i = 0; i < 4; i++)
+    for(unsigned i = 0; i < 8; i++)
     {
         tempImg = Mat::zeros(img.size(),CV_8U);
         line(tempImg, pt,testPts[i], Scalar(255,255,255), 1,8);

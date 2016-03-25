@@ -6,7 +6,8 @@ using namespace std;
 int main()
 {
 	MyFeatureDetector* myDetector = new MyFeatureDetector();
-	myDetector->init("Flowers/Shape1/shape1-003.ppm");
+	if(myDetector->init("Flowers/Shape1/shape1-000.ppm") != 0)
+        {
        	myDetector->drawCircle2();
         myDetector->drawSkeleton(2);
         cout << "final shape" << endl;
@@ -15,6 +16,10 @@ int main()
 
 
 	myDetector->exit();
+        }
+        else
+            cout << "file could not be initialized" << endl;
+
 	delete myDetector;
 
 	return 1;

@@ -13,59 +13,9 @@ MyFeatureDetector::~MyFeatureDetector(void)
 //test() tests all the function in the MyFeatureDetector class
 void MyFeatureDetector::test(char* imgname)
 {
-    MyTools tools;
-    //Initialize the image
-    ifstream file;
-    file.open(imgname);
-
-    if(file.is_open())
-    {
-
-        shapes = imread(imgname,CV_8U);
-        Mat detectedEdges = Mat::zeros(shapes.size(), CV_8U);
-        Mat drawing = Mat::zeros(shapes.size(),CV_8U);
-        Mat reducedImage = Mat::zeros(shapes.size(),CV_8U);
-
-
-        namedWindow("raw image", CV_WINDOW_FREERATIO);
-        imshow("raw image", shapes);
-
-        //Not sure why but for some reason when I use canny I get a clear image of all the shapes but when I
-        //run findContours() on shape1 it seems to change the image.
-        //Finds the verticies of the image
-        vector<vector<Point> > contours;
-        vector<Vec4i> heirarchy;
-
-        //Run Canny which highlights the verticies of the shape
-        blur(shapes, detectedEdges, Size(3,3));
-        namedWindow("blured image", CV_WINDOW_FREERATIO);
-        imshow("blured image", detectedEdges);
-
-
-        Canny(detectedEdges,detectedEdges,50,150,3);
-        namedWindow("detected edges", CV_WINDOW_FREERATIO);
-        imshow("detected edges", detectedEdges);
-
-        cout << "canny run successfully" << endl;
-
-        drawing = drawing + detectedEdges;
-        namedWindow("drawing U detectedEdges", CV_WINDOW_FREERATIO);
-        imshow("drawing U detectedEdges", drawing);
-
-        //Finds contours of the image
-        //Basically verticies that are next to each other.
-        //And draws it onto a drawing board with blue coloring
-        findContours(detectedEdges,contours,heirarchy,CV_RETR_LIST,CV_CHAIN_APPROX_SIMPLE,Point());
-        cout << "contours found" << endl;
-        //contours = tools.removeOutliers(contours);
-
-        file.close();
-    }
-    else
-        cout << "failed to open" << imgname << endl;
 }
 
-void MyFeatureDetector::init(char* imgname)
+bool MyFeatureDetector::init(char* imgname)
 {
     MyTools tools;
     //Initialize the image
@@ -120,8 +70,6 @@ void MyFeatureDetector::init(char* imgname)
         findContours(detectedEdges,contours,heirarchy,CV_RETR_LIST,CV_CHAIN_APPROX_SIMPLE,Point());
         cout << "contours found" << endl;
 
-        
-
         //remove outliers
         contours = tools.removeOutliers(contours);
 
@@ -130,12 +78,12 @@ void MyFeatureDetector::init(char* imgname)
             drawContours(drawing,contours,i,Scalar(255,255,255),0,8,heirarchy,0,Point());
 
         //Store contours created in previous step in pSet of class
-        vector<Point> temp;
+        vector<Point> tempSet;
         for(unsigned i = 0; i < contours.size(); i++)
         {
             for(unsigned j = 0; j < contours[i].size(); j++)
             {
-                temp.push_back(Point(contours[i][j]));
+                tempSet.push_back(Point(contours[i][j]));
                 pSet.push_back(new Point(contours[i][j]));
             }
         }
@@ -174,23 +122,52 @@ void MyFeatureDetector::init(char* imgname)
         //Close the shape
         tools.closeImage(maps,reducedImage);
 
+        //create temp vector
+        vector<Point> temp;
+        for(int i = 0; i < (int)pSet.size(); i++)
+            temp.push_back(Point(pSet[i]->x,pSet[i]->y));
+
         //enclose the shape with a circle.
         Mat bCircle = Mat::zeros(drawing.size(), CV_8U);
-        //for(int i = 0; i < (int)contours.size(); i++)
-        //        drawContours(hull_temp,hull, i, Scalar(255,255,255), 2, 8, vector<Vec4i>(), 0, Point());
-
         Point2f center = Point2f(0,0);
         float radius = 0;
-        //for(int i = 0; i < (int)contours.size(); i++)
-            minEnclosingCircle(temp,center,radius);
+        minEnclosingCircle(temp,center,radius);
         circle(bCircle, center, radius, Scalar(255,255,255), 2, 8);
 
         //enclose the shape with a rectangle.
         Mat rec_temp = Mat::zeros(drawing.size(),CV_8U);
         Rect bRect;
         //for(int i = 0; i < (int)contours.size(); i++)
-            bRect = boundingRect(temp);
+        bRect = boundingRect(temp);
         rectangle(rec_temp, bRect.tl(), bRect.br(), Scalar(255,255,255), 2, 8);
+
+        //enclose the shape with a hull.
+        convexHull(Mat(temp), hull, true);
+        Mat img = Mat::zeros(drawing.size(), CV_8U);
+        unsigned hullcount = hull.size();
+        Point pt0 = temp[hull[hullcount-1]];
+        for(unsigned i = 0; i < hullcount; i++ )
+        {
+            Point pt = temp[hull[i]];
+            line(img, pt0, pt, Scalar(255,255,255), 1,LINE_AA);
+            pt0 = pt;
+        }
+
+        //For whatever reason I can't correctly find all the convexity defects.
+        //find convexity defects
+        //vector<Vec4i> defects;
+        //convexityDefects(temp,hull,defects);
+        //for(unsigned i = 0; i < defects.size(); i++)
+        //{
+        //    Mat defectsImg = Mat::zeros(drawing.size(), CV_8U);
+        //    circle(defectsImg, temp[defects[i].val[2]], 20, Scalar::all(255), 2, 8);
+        //    circle(defectsImg, temp[defects[i].val[0]],10,Scalar::all(255),-1,8);
+        //    circle(defectsImg, temp[defects[i].val[1]],10, Scalar::all(255), -1,8);
+            //defectsImg = img | defectsImg;
+            //namedWindow("defects",CV_WINDOW_FREERATIO);
+            //imshow("defects",defectsImg);
+            //waitKey(0);
+        //}
         //tools contain the functions made by Masa Hu
         ////////////////////////////////////
         //////////////////////////////
@@ -200,20 +177,21 @@ void MyFeatureDetector::init(char* imgname)
         shapes = reducedImage;
         boundCircle = bCircle;
         boundRect = rec_temp;
+        boundHull = img;
 
         //if you'd like you can show the basic images we created
         namedWindow("drawing",CV_WINDOW_FREERATIO);
+        //namedWindow("hull", CV_WINDOW_FREERATIO);
         imshow("drawing",drawing);
-        waitKey(1);
+        //imshow("hull",img);
+        waitKey(0);
         //namedWindow("reducedImage",CV_WINDOW_FREERATIO);
         //imshow("reducedImage",reducedImage);
 
         file.close();
+        return 1;
     }
-    else
-    {
-        cout << "failed to open" << imgname << endl;
-    }
+    return 0;
 }
 void MyFeatureDetector::exit()
 {
@@ -256,9 +234,11 @@ Mat MyFeatureDetector::drawSet(vector<int> set)
 //jittering the circle returns a point where the circle does not intersect any part of the shape.
 Circle MyFeatureDetector::insertCircle(Mat shape, Point seed)
 {
-    bool isInside = tools.isInside(seed,shapes);
-    bool isOn = tools.isOn(seed,shape);
-    if(isInside == false || isOn == true){
+    while(tools.isOn(seed,shape))
+        tools.jitterCircle(seed,5, shape);
+    //bool isInside = tools.isInside(seed,shapes);
+    bool isInside2 = tools.isInside2(seed,shapes);
+    if(isInside2 == false){
         Circle falseCircle;
         falseCircle.radius = -1;
         return falseCircle;
@@ -303,7 +283,6 @@ Circle MyFeatureDetector::insertCircle(Mat shape, Point seed)
 
 Circle MyFeatureDetector::insertCircle2(Mat shape, Circle prev, Point seed)
 {
-    //namedWindow("shape to insert on", CV_WINDOW_FREERATIO);
     namedWindow("circle img", CV_WINDOW_FREERATIO);
     Circle myCircle;
     if(tools.isOn(seed, shape))
@@ -353,10 +332,14 @@ Circle MyFeatureDetector::insertCircle2(Mat shape, Circle prev, Point seed)
                 circle(circle_img, new_center_pt, radius, Scalar(255,255,255),1, 8);
                 touchingShape = tools.doesIntersect(shape, circle_img);
 
+                //if it failes both definition of inside a shape, return a -1
                 if(!tools.isInside2(new_center_pt, shapes))
                 {
-                    myCircle.radius = -1;
-                    return myCircle;
+                    if(!tools.isInside(new_center_pt,shapes))
+                    {
+                        myCircle.radius = -1;
+                        return myCircle;
+                    }
                 }
 
                 //////////////////////////////////////////////////////////////////////
@@ -377,8 +360,6 @@ Circle MyFeatureDetector::insertCircle2(Mat shape, Circle prev, Point seed)
             else
                 new_center_pt = temppt;
         }
-        else
-            cout << "error, newSeedPt.size() < 1" << endl;
     }
 
     myCircle.center = new_center_pt;
@@ -387,150 +368,6 @@ Circle MyFeatureDetector::insertCircle2(Mat shape, Circle prev, Point seed)
     circle(myCircle.shape, myCircle.center, myCircle.radius, Scalar(255,255,255), -1, 8);
 
     return myCircle;
-}
-
-
-//Truth Table for acceptable points
-//a = isOn Shape; b = isOn Circle; c = isInside Shape; d = isInside Circle
-//------------------------------------------------------------------------
-//a|b|c|d|result
-//--------------
-//0|0|0|0|exit
-//0|0|0|1|invalid
-//0|0|1|0|Q.add
-//0|0|1|1|increment
-//0|1|0|0|exit
-//0|1|0|1|invalid
-//0|1|1|0|invalid
-//0|1|1|1|increment
-//exit on all other states
-
-//1. create 8 different directions
-//2. push centroid of the shape into the que
-//3. push all 8 directions into a vector
-//4. loop while que isn't empty
-//5. pop one point from que and try to insert a circle
-//6. if the circle is acceptable then draw the circle on the window
-//7. then check to see if new acceptable points can be found in the 8 directions
-//8. Push all acceptable points onto the que.
-//9. repeat loop from step 4.
-
-void MyFeatureDetector::drawCircle()
-{
-    //namedWindow("circle", CV_WINDOW_FREERATIO);			
-    namedWindow("shapes",CV_WINDOW_FREERATIO);			     
-    namedWindow("circles to add", CV_WINDOW_FREERATIO);     
-    Mat circlestoadd = Mat::zeros(shapes.size(), CV_8U);
-    Mat newShape = Mat::zeros(shapes.size(),CV_8U);
-    newShape = shapes | newShape;
-
-    Point seed = tools.findCentroid(pSet);
-    queue<Point> que;
-    que.push(seed);
-
-    Vec2d vec1 = Vec2d(1,0);
-    Vec2d vec2 = Vec2d(0,1);
-    Vec2d vec3 = Vec2d(-1,0);
-    Vec2d vec4 = Vec2d(0,-1);
-    Vec2d vec5 = Vec2d(1,1);
-    Vec2d vec6 = Vec2d(-1,-1);
-    Vec2d vec7 = Vec2d(-1,1);
-    Vec2d vec8 = Vec2d(1,-1);
-
-    vector<Vec2d> normalizedVectors;
-    normalizedVectors.push_back(vec1);
-    normalizedVectors.push_back(vec2);
-    normalizedVectors.push_back(vec3);
-    normalizedVectors.push_back(vec4);
-    normalizedVectors.push_back(vec5);
-    normalizedVectors.push_back(vec6);
-    normalizedVectors.push_back(vec7);
-    normalizedVectors.push_back(vec8);
-    while(que.size() > 0){
-        //Pop one from que
-        Point pt = que.front();
-        que.pop();
-
-        //insert circle  
-        //check to see if you can insert the circle correctly. 
-        vector<Point> intersectPoints;
-        Circle myCircle = insertCircle(newShape, pt);
-        if(myCircle.radius != -1)
-            intersectPoints = tools.findIntersections(myCircle.shape,newShape);
-
-        //Make sure your circle isn't inside any of the old circles you found already.
-        bool isInsideCircles = false;
-        for(unsigned j = 0; j < circles.size(); j++)
-        {
-            if(tools.isInside(myCircle.center,circles[j].shape))
-                isInsideCircles = true;
-        }
-
-        bool isOutsideShape = false;
-        if(myCircle.center.x > shapes.cols || myCircle.center.y > shapes.rows)
-            isOutsideShape = true;
-        //Finding a circle that can be inserted with 3 or more intersections is the criteria of acceptance for the insertion
-        //of a circle into the shape. The circle will be inside the shape && notOn newShape
-        //new circles to be accepted cannot be inside any of the accepted circles.
-        if(intersectPoints.size() < 3 || isInsideCircles == true || isOutsideShape == true)
-            cout << "found less than 3 intersections or is inside one of the other circles or is Outside shape." << endl;
-        else if(intersectPoints.size() >= 3)
-        {
-            cout << "circle accepted" << endl;
-            Circle copy = Circle(myCircle.center, myCircle.radius, myCircle.shape);
-            circles.push_back(copy);
-            //If everything goes well we update newShape
-            newShape = newShape + myCircle.shape;
-
-            unsigned m = normalizedVectors.size();
-
-            for(unsigned i = 0; i < m; i++)
-            {
-                Point tempPt = myCircle.center;
-                bool exitLoop = false;
-                while(!exitLoop)
-                {
-                    //isInside(shapes && !isOn(newShape) && !isInside(circles)
-                    if(tools.isInside(tempPt,shapes)
-                            && !tools.isOn(tempPt,newShape)
-                            && !tools.isInside(tempPt,myCircle.shape))
-                    {
-                        exitLoop = true;
-                        que.push(Point(tempPt.x,tempPt.y));
-                    }
-                    //I suppose this could potentially fail if Your somehow end up always in the circle and not on the shape.
-                    //Karnaugh Map representation of this gives us the output.
-                    //We make sure normalized vectors does not have a vector of {0,0} otherwise we skip over it.
-                    else if((tools.isOn(tempPt,newShape) && tools.isInside(tempPt,shapes)) || (tools.isInside(tempPt,shapes) && tools.isInside(tempPt,myCircle.shape)))
-                    {
-
-                        double x = tempPt.x + normalizedVectors[i][0];
-                        double y = tempPt.y + normalizedVectors[i][1];
-
-                        tempPt = Point(x,y);
-                        if(normalizedVectors[i][0] == 0 && normalizedVectors[i][1] == 0)
-                            exitLoop = true;
-                    }
-                    else
-                    {
-                        que.push(Point(tempPt.x,tempPt.y));
-                        exitLoop = true;
-                        //exit loop without adding anything to Queue
-                    }
-                }  
-            }
-        }
-
-        for(unsigned i = 0; i < que.size(); i++)
-        {
-            circle(circlestoadd, que.front(), 10, Scalar(255,255,255), -1, 8);
-        }
-        circlestoadd = newShape + circlestoadd;
-
-        imshow("circles to add", circlestoadd);
-        imshow("shapes",newShape);
-        waitKey(0);
-    }
 }
 
 //1. insert a circle in the centroid of the shape
@@ -583,8 +420,6 @@ void MyFeatureDetector::drawCircle2()
         //waitKey(0);
         ////////////////////////////////////////////////////////////////////////////////////////////////
         //
-
-        cout << "intersection.size(): " << intersections.size() << endl;
         //double check to be sure next circle is not on the newShape at all
         if(intersections.size() > 1 && !tools.isOn(myCircle.center, newShape))
         {
@@ -662,67 +497,73 @@ void MyFeatureDetector::drawCircle2()
                 //imshow("my circle", my_circle);
                 //    waitKey(0);
                 ////////////////////////////////////////////////////////////////////////////////////////////////                   
-                if(c.radius != -1 && c.radius > 2 && c.radius < newShape.cols)
-                {
+                if(c.radius != -1 && c.radius < newShape.cols)
                     if(!tools.isOn(c.center, newShape) && !tools.isOn(c.center, myCircle.shape))
                         que.push_back(c);
-                } 
             }//end while
 
-            cout << "que.size(): " << que.size() << endl;
             //update the newShape so we don't draw into the prev circles (Not sure if we might still draw into prev circles);
             //turns out we do...
             //NOTE: since we divide the growth of the circle by arcs we assume we won't pass into other circle's territories.
             newShape = newShape | myCircle.shape;
 
             /////////////////////////////////////////////////////////////////////////////////////////    
-            namedWindow("new shape", CV_WINDOW_FREERATIO);
-            imshow("new shape", newShape);
+            //namedWindow("new shape", CV_WINDOW_FREERATIO);
+            //imshow("new shape", newShape);
 
-            Mat circlesInQue = Mat::zeros(newShape.size(), CV_8U);
-            circlesInQue = newShape | circlesInQue;
-            for(unsigned i = 0; i < que.size(); i++)
-                circlesInQue = circlesInQue | que[i].shape;
-            namedWindow("circles in que", CV_WINDOW_FREERATIO);
-            imshow("circles in que", circlesInQue);
-            waitKey(1);
+            //Mat circlesInQue = Mat::zeros(newShape.size(), CV_8U);
+            //circlesInQue = newShape | circlesInQue;
+            //for(unsigned i = 0; i < que.size(); i++)
+            //    circlesInQue = circlesInQue | que[i].shape;
+            //namedWindow("circles in que", CV_WINDOW_FREERATIO);
+            //imshow("circles in que", circlesInQue);
+            //waitKey(1);
             /////////////////////////////////////////////////////////////////////////////////////////
-
-            cout << "circles.size(): " << circles.size() << endl;
         }//end if
     }//end while
 }//end function drawCircle2
 
-
 void MyFeatureDetector::drawSkeleton(int fudge)
 {
-    Mat newShape = Mat::zeros(shapes.size(), CV_8U);
+    skeleton = Mat::zeros(shapes.size(), CV_8U);
+    for(unsigned i = 0; i < circles.size(); i++)
+        skeletonMap.push_back(new Node(Point(circles[i].center)));
     for(unsigned i = 0; i < circles.size(); i++)
     {
         for(unsigned j = 0; j < circles.size(); j++)
         {
-            Mat c1 = Mat::zeros(shapes.size(), CV_8U);
-            Mat c2 = Mat::zeros(shapes.size(), CV_8U);
-            circle(c1, circles[i].center, circles[i].radius, Scalar(255,255,255), fudge, 8);
-            circle(c2, circles[j].center, circles[j].radius, Scalar(255,255,255), fudge, 8);
-            Mat tempLine = Mat::zeros(shapes.size(), CV_8U);
-            if(tools.doesIntersect(c1, c2) && i != j)
-                line(tempLine, circles[i].center, circles[j].center, Scalar(255,255,255), 2, 8);
-
-            if(!tools.doesIntersect(tempLine,shapes))
-                newShape = newShape | tempLine;
+            if(i != j)
+            {
+                Mat c1 = Mat::zeros(shapes.size(), CV_8U);
+                Mat c2 = Mat::zeros(shapes.size(), CV_8U);
+                circle(c1, circles[i].center, circles[i].radius, Scalar(255,255,255), fudge, 8);
+                circle(c2, circles[j].center, circles[j].radius, Scalar(255,255,255), fudge, 8);
+                Mat tempLine = Mat::zeros(shapes.size(), CV_8U);
+            
+                if(tools.doesIntersect(c1, c2))
+                {
+                        line(tempLine, circles[i].center, circles[j].center, Scalar(255,255,255), 2, 8);
+                        if(!tools.doesIntersect(tempLine,shapes))
+                        {
+                            skeletonMap[i]->edge.push_back(skeletonMap[j]);
+                            skeleton = skeleton | tempLine;
+                        }
+                }
+            }
         }
-        Mat circle_img = Mat::zeros(shapes.size(), CV_8U);
-        circle(circle_img, circles[i].center, circles[i].radius, Scalar(255,255,255), 2, 8);
-        newShape =  newShape | circle_img;
+        circle(skeleton, circles[i].center, 5, Scalar::all(255), -1, 8);
+        //circle(skeleton, circles[i].center, circles[i].radius, Scalar(255,255,255), 2, 8);
     }
-    shapes = shapes | newShape;
 }
 
 void MyFeatureDetector::showShape()
 {
-    shapes = shapes | boundCircle | boundRect;
+    Mat finalShape = shapes | boundCircle | boundRect | boundHull | skeleton;
     namedWindow("final shape", CV_WINDOW_FREERATIO);
-    imshow("final shape", shapes);
+    namedWindow("boundHull",CV_WINDOW_FREERATIO);
+    namedWindow("skeleton", CV_WINDOW_FREERATIO);
+    imshow("final shape", finalShape);
+    imshow("boundHull", boundHull);
+    imshow("skeleton", skeleton);
     waitKey(0);
 }
