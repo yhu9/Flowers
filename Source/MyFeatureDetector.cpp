@@ -13,6 +13,7 @@ MyFeatureDetector::~MyFeatureDetector(void)
 //test() tests all the function in the MyFeatureDetector class
 void MyFeatureDetector::test(char* imgname)
 {
+
 }
 
 bool MyFeatureDetector::init(char* imgname)
@@ -123,54 +124,35 @@ bool MyFeatureDetector::init(char* imgname)
         tools.closeImage(maps,reducedImage);
 
         //create temp vector
-        vector<Point> temp;
         for(int i = 0; i < (int)pSet.size(); i++)
-            temp.push_back(Point(pSet[i]->x,pSet[i]->y));
+            pointSet.push_back(Point(pSet[i]->x,pSet[i]->y));
 
         //enclose the shape with a circle.
         Mat bCircle = Mat::zeros(drawing.size(), CV_8U);
         Point2f center = Point2f(0,0);
         float radius = 0;
-        minEnclosingCircle(temp,center,radius);
+        minEnclosingCircle(pointSet,center,radius);
         circle(bCircle, center, radius, Scalar(255,255,255), 2, 8);
+        bCirc = Circle(center,radius);
 
         //enclose the shape with a rectangle.
         Mat rec_temp = Mat::zeros(drawing.size(),CV_8U);
-        Rect bRect;
         //for(int i = 0; i < (int)contours.size(); i++)
-        bRect = boundingRect(temp);
+        bRect = boundingRect(pointSet);
         rectangle(rec_temp, bRect.tl(), bRect.br(), Scalar(255,255,255), 2, 8);
 
         //enclose the shape with a hull.
-        convexHull(Mat(temp), hull, true);
+        convexHull(Mat(pointSet), hull, true);
         Mat img = Mat::zeros(drawing.size(), CV_8U);
         unsigned hullcount = hull.size();
-        Point pt0 = temp[hull[hullcount-1]];
+        Point pt0 = pointSet[hull[hullcount-1]];
         for(unsigned i = 0; i < hullcount; i++ )
         {
-            Point pt = temp[hull[i]];
+            Point pt = pointSet[hull[i]];
             line(img, pt0, pt, Scalar(255,255,255), 1,LINE_AA);
             pt0 = pt;
         }
 
-        //For whatever reason I can't correctly find all the convexity defects.
-        //find convexity defects
-        //vector<Vec4i> defects;
-        //convexityDefects(temp,hull,defects);
-        //for(unsigned i = 0; i < defects.size(); i++)
-        //{
-        //    Mat defectsImg = Mat::zeros(drawing.size(), CV_8U);
-        //    circle(defectsImg, temp[defects[i].val[2]], 20, Scalar::all(255), 2, 8);
-        //    circle(defectsImg, temp[defects[i].val[0]],10,Scalar::all(255),-1,8);
-        //    circle(defectsImg, temp[defects[i].val[1]],10, Scalar::all(255), -1,8);
-            //defectsImg = img | defectsImg;
-            //namedWindow("defects",CV_WINDOW_FREERATIO);
-            //imshow("defects",defectsImg);
-            //waitKey(0);
-        //}
-        //tools contain the functions made by Masa Hu
-        ////////////////////////////////////
-        //////////////////////////////
         ///////////////////////
 
         contourSet = contours;
@@ -184,7 +166,7 @@ bool MyFeatureDetector::init(char* imgname)
         //namedWindow("hull", CV_WINDOW_FREERATIO);
         imshow("drawing",drawing);
         //imshow("hull",img);
-        waitKey(0);
+        //waitKey(0);
         //namedWindow("reducedImage",CV_WINDOW_FREERATIO);
         //imshow("reducedImage",reducedImage);
 
@@ -343,10 +325,10 @@ Circle MyFeatureDetector::insertCircle2(Mat shape, Circle prev, Point seed)
                 }
 
                 //////////////////////////////////////////////////////////////////////
-                Mat temp = Mat::zeros(shape.size(), CV_8U);
-                temp = circle_img | shape | prev.shape;
-                imshow("circle img", temp);
-                waitKey(1);
+                //Mat temp = Mat::zeros(shape.size(), CV_8U);
+                //temp = circle_img | shape | prev.shape;
+                //imshow("circle img", temp);
+                //waitKey(1);
                 //////////////////////////////////////////////////////////////////////
             }
 
@@ -554,6 +536,108 @@ void MyFeatureDetector::drawSkeleton(int fudge)
         circle(skeleton, circles[i].center, 5, Scalar::all(255), -1, 8);
         //circle(skeleton, circles[i].center, circles[i].radius, Scalar(255,255,255), 2, 8);
     }
+}
+
+double MyFeatureDetector::extractAreaOfCircles(){
+    double total = 0.0;
+    for(unsigned i = 0; i < circles.size(); i++){
+        total += circles[i].calcArea();
+    }
+
+    features.push_back(total);
+    return total;
+}
+
+double MyFeatureDetector::extractAreaOfBoundRect(){
+    double total = bRect.width * bRect.height;
+    features.push_back(total);
+    return (double)total;
+}
+
+double MyFeatureDetector::extractAreaOfBoundHull(){
+    double total = 0.0;
+    vector<Point> tmp;
+    for(unsigned i = 0; i < hull.size(); i++){
+        tmp.push_back(*pSet[hull[i]]);
+    }
+    total = contourArea(tmp);
+    features.push_back(total);
+    return total;
+}
+
+double MyFeatureDetector::extractNumberOfSkeletonNodes(){
+    features.push_back((double)circles.size());
+    return (double)circles.size();
+}
+
+double MyFeatureDetector::extractNumberOfHullNodes(){
+    features.push_back((double)circles.size());
+    return (double)hull.size();
+}
+
+double MyFeatureDetector::extractHullLength(){
+    double total = 0.0;
+    for(int i = 0; i < (int)hull.size(); i++){
+        int a = hull[i];
+        int b = hull[(i + 1) % (int)hull.size()];
+        total += tools.findDistance(pointSet[a],pointSet[b]);
+    }
+    features.push_back(total);
+    return total;
+}
+
+double MyFeatureDetector::extractSkeletonLength(){
+    double total = 0.0;
+    for(unsigned i = 0; i < skeletonMap.size(); i++){
+        double d = 0.0;
+        for(unsigned j = 0; j < skeletonMap[i]->edge.size(); j++)
+        {
+            d += tools.findDistance(skeletonMap[i]->pt,skeletonMap[i]->edge[j]->pt);
+
+        }
+        total += d / 2;
+    }
+    features.push_back(total);
+    return total;
+}
+
+double MyFeatureDetector::extractAverageDegree(){
+    double total = 0.0;
+    for(unsigned i = 0; i < skeletonMap.size(); i++){
+        total += (double)skeletonMap[i]->edge.size();
+    }
+    total = total / (double) skeletonMap.size();
+    features.push_back(total);
+    return total;
+}
+
+double MyFeatureDetector::extractAverageAngle(){
+    double total = 0.0;
+    double n = 0;
+    for(unsigned i = 0; i < skeletonMap.size(); i++){    
+        double a = skeletonMap[i]->edge.size();
+        if(a != 0)
+        {
+            total += 360 / a;
+            n++;
+        }
+    }
+    cout << total << n << endl;
+    total = total / n;
+    features.push_back(total);
+    return total;
+}
+
+double MyFeatureDetector::extractAreaOfFirstCircle(){
+    double total = circles[0].calcArea();
+    features.push_back(total);
+    return total;
+}
+
+double MyFeatureDetector::extractDegreeOfFirstCircle(){
+    double total = (double)skeletonMap[0]->edge.size();
+    features.push_back(total);
+    return total;
 }
 
 void MyFeatureDetector::showShape()

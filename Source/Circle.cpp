@@ -37,6 +37,10 @@ void Circle::createPoints()
 		cPoints.push_back(newpt);
 	}
 }
+
+double Circle::calcArea(){
+    return (double)(3.141592653 * this->radius * this->radius);
+}
 /*
 Point Circle::findPoint(Vec2i ray)
 {
