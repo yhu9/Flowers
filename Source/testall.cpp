@@ -34,7 +34,8 @@ public:
   bool testAddCircle(){return false;}
   bool testDrawCircle2(){return false;}
   bool testTraverseMap(){return false;}
-  bool testInsertCircle(){
+  
+  /*bool testInsertCircle(){
     Mat img1 = Mat::zeros(400,400,CV_8U);
     Mat img2 = Mat::zeros(400,400,CV_8U); 
     Mat img3 = Mat::zeros(400,400,CV_8U); 
@@ -64,6 +65,7 @@ public:
       return true;
 
     return false;}
+*/
   bool testDrawSet(){return false;}
   bool testSeparateShape(){return false;}
   //Test Node class
@@ -131,6 +133,8 @@ public:
   bool testSubractionOfPoints(){return false;}
   bool testRandomize(){return false;}
   bool testJitterCircle(){return false;}
+
+  bool testExtractAverageAngle(){return false;}
 };
 
 
@@ -143,8 +147,15 @@ int main()
   TestingClass tester = TestingClass();
   
   //test MyFeatureDetector Class
-  testMyFeatureDetectorClass->init("Flowers/testForMasa.png");
+  testMyFeatureDetectorClass->init("Flowers/Shape1/shape1-000.ppm");
+  testMyFeatureDetectorClass->drawCircle2();
+  if(testMyFeatureDetectorClass->getCircles().size() > 0)
+	testMyFeatureDetectorClass->drawSkeleton(2);
 
+
+	double v1 = testMyFeatureDetectorClass->extractAverageAngle();
+	cout << "average angle is: " << v1 << endl;
+	testMyFeatureDetectorClass->showShape(0);
 
   testMyFeatureDetectorClass->exit();
   delete testMyFeatureDetectorClass;

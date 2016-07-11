@@ -439,6 +439,7 @@ void MyTools::subtractionOfPoints(vector<Point> set1,vector<Point> set2, vector<
         }
     }
 }
+
 bool MyTools::doesIntersect(Mat img1, Mat img2)
 {
     //Should later make sure that all image types are of type CV_8U to make the comparison

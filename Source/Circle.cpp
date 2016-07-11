@@ -21,7 +21,6 @@ Circle::Circle(Point centerIn, double radiusIn, Mat shapeIn)
         shape = shape | shapeIn;
 }
 
-
 Circle::~Circle(void)
 {
 }

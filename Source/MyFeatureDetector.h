@@ -23,8 +23,9 @@ public:
 	bool init(char*);
 	//vector<Point> addCircle(int setid,int cid, vector<Point> pointSet);
 
-	void drawCircle();     
-        void drawCircle2();
+	///////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////
+
 private:
 	//Sets
 	vector<vector<Point> > contourSet;      //contourSet holds the points as findContours found it
@@ -48,43 +49,46 @@ private:
         vector<Node*> skeletonMap;           //map of circles
                                                 //I could make a map for hull also but its just a single linked list
         
-        //output variables
-	vector<double> features;                   //features of the image based on structures and other criteria
+		MyTools tools;
+public:
+		vector<double> features;
 
-        //Objects we wish to use for the class
-	MyTools tools;
-public://private functions
         double extractAreaOfCircles();          //complete
-        double extractAreaOfBoundRect();
-        double extractAreaOfBoundHull();
-        double extractNumberOfHullNodes();
-        double extractNumberOfSkeletonNodes();
-        double extractHullLength();
-        double extractSkeletonLength();
-        double extractAverageDegree();
-        double extractAverageAngle();
-        double extractAreaOfFirstCircle();
-        double extractDegreeOfFirstCircle();
+        double extractAreaOfBoundRect();		//complete
+        double extractAreaOfBoundHull();		//complete
+        double extractNumberOfHullNodes();		//complete
+        double extractNumberOfSkeletonNodes();	//complete
+        double extractHullLength();				//complete
+        double extractSkeletonLength();			//complete
+        double extractAverageDegree();			//complete
+        double extractAverageAngle();			//complete
+        double extractAreaOfFirstCircle();		//complete
+        double extractDegreeOfFirstCircle();	//complete
+		void addFeature(double);
+		vector<Circle> getCircles();
 
 
         int feature_averageDistanceOfImageNodesInSpace();
         int feature_imageDiameter();
 
-        int feature_degreeOfFirstCircle();
         int feature_averageAreaOfCircles();
         int feature_numberOfClusters();
         int feature_skeletonDiameter();
         int feature_skeletonModularity();
         int feature_skeletonLength();
-public:
+
+		///////////////////////////////////////////////////////////////////////////////////////////
+		void drawSkeleton(int fudge); 
+		void drawCircle();     
+		void drawCircle2();
+		void printSkeletonMap();
+        void showShape(int time);
+		///////////////////////////////////////////////////////////////////////////////////////////
+private:
 	//Functions
-	//void traverseMap();
-	//Circle insertCircle(Mat shape, vector<int> set);
 	Circle insertCircle(Mat shape, Point seed);
 	Circle insertCircle2(Mat shape, Circle prev, Point seed);
-        void showShape();
-        void drawSkeleton(int fudge); 
-        Mat drawSet(vector<int> set);
+    Mat drawSet(vector<int> set);
 	Mat drawSet(deque<int> set);
 	//void separateShape(vector<int> ids);
 };
