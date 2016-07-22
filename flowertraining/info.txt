@@ -1,0 +1,27 @@
+A summary for all the trials done.
+
+Trial 1:
+
+	This trial was highly unsuccessful. The test could not classify any images to be within the learned area. Only 10 images were used and only 2 images were used for the test. A better trial with more data may be necessary. The problem may also lie in the fact that the features were not normalized between 0-1 as they are in the examples given in the svm_light website.
+
+Trial 2:
+
+	The results of this trial were also hight unsuccessful even after normalizing the values between 0-1. The same situation was in the previous trial where only 2 images were used for the test and 10 images were used for the learning. Perhaps the error is coming from the amount of data in the inclusion process.
+
+Trial 3:
+	
+	Trial 3 turned out to be quite successful. This time I only worked with 2 shapes, shape1 and shape2. I used shape1 for the inclusion process and shape2 was in the exclusion for the learning. I had 2 tests and both gave an error rate less than 20% and was able to classify shapes within and out of the included shapes (finally). Test1 was done using all the same images in the learning process. Test2 took out half of the shapes and used the other half for classification to see if it was still possible to classify images that were not part of the learned set.
+
+Trial 4:
+
+	Trial 4 was a great success! The tests done were on all shapes and the procedure on each one was identical. The following lists the details included in each learning and classification module.
+
+1. all images for the individual shape was included. For instance, for the shape1 file, all shape1 images were included in the training process
+
+2. only 5 images from every other shape was used as training to disclude
+
+3. all of the same images in the training were used in the classification portion
+
+The reasoning for this method was because using more discluded images than included images caused the classfication test to produced severly wrong results. However, the results for this method proved to be quite high in correctly classifying an image into its respective shape. Although the some shapes were better than others. An important thing to keep in mind is the possibility that the low accuracy rate is not wrong but could be a useful feature. The accuracy ratings are percentages on how wrong the guess was. A negative and possitive value between -1 and 1 show how much the image was discluded or included. Most of the time an included image is highly positive and a discluded image is highly negative. However, during the classification period, sometimes an image that was included would be incorrectly discluded because its features do not fit with the set of included images. It is possible though that an error could just be showing that an image that was thought to be in the included set was not actually supposed to be in the included set. More testing and further analysis needs to be done in order to conclude this possibility using an svm.
+
+Perhaps a good way to check if an svm is capable of finding incorrect classfication of feature sets is by testing the svm on shapes that are unrefutably similar to each other in a way that they can be classified together.

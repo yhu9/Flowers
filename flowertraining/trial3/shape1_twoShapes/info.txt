@@ -1,0 +1,13 @@
+Results could be skewed for result2 due to the fact that the training file is the exact same as the testing file. In orer to counter act this, result2b was created by only using half of the vectors included in the learning process in result2 and the rest was used in order to test the classification process.
+
+Results
+1. As previously thought, including more vectors did in fact improve the results by a significant amount.
+2. There is over 80% accuracy with the tests.
+3. result2 had an accuracy of over 90% when using the same images used for the learning process
+4. result2b had an accuracy of over 80% when using images that were not in the learning process.
+
+Conclusion
+
+It could be interesting to see if the same images that provided the error are actually images that do not belong in the set. Further analysis of the features extracted could prove that this method of categorization is better than the visual based assessment provided by students. THe problem images are always the samea.
+
+It is good to note that there were no problems in discluding an image. There were only problems classifying images to be within the learned set.

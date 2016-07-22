@@ -1,0 +1,20 @@
+all images from shape 1 used
+all images from shape 2 used
+svm includes shape1 and discludes shape2 in the learning process
+the following features were used
+
+1. areaOfCircles
+2. areaOfBoundingHull
+3. skeletonLength
+4. averageNodeDegree
+
+The reason for using less features from the image is to test whether or not some of the features are making the classification process unstable. If the features do not show the uniqueness of the shapes then it is possible that those features may worsen the results. However, theoretically the features that do show the uniqueness of the different shapes should counteract the many different features. This should be tested in the next trial by increasing the number of features while maintaining the images used in the process.
+
+The SVM learns and creates models based on the coordinates of the vectors given the feature values. In the previous trials I have been using only 2 images in the inclusion process and 8 images in the disclusion process of the learning portion of the svm. However, this may have created an error in the classification portion of the svm because of the lack of feature sets in the inclusion process. The more images included, the larger the area of images so that tests could produced proper results by meeting the inclusion criteria. As an example of the error caused, imagine an SVM with 2 feature sets; 1 included and the other discluded. The SVM would split the two sets with a line right down the middle. Now, imagining the sets as dots on a 2-d graph, imagine 2 dots included and 50 dots discluded. the included area would consist of a small line whereas the discluded area would be overwhelming.
+
+This test will also use the new drawing functions which does not use the midpoints of the arcs anymore. This may change the results however, this method produces images which are more filled with circles than the previous method. Therefore, from now on this method of drawing will be used.
+
+I am also gonna try to use only 2 shapes in this training to see if less shapes would decrease the error rate. I will also try to see if using all shapes would increase the error rate. In total 3 different tests will be done on this trial.
+
+1. test with only two shapes using all images of both shapes
+2. test using all shapes with all images of each shape

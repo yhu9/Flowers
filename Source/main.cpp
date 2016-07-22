@@ -13,11 +13,12 @@ int main()
 	vector<vector<MyFeatureDetector> > shapeDetectors;
 	shapeDetectors.push_back(shape1Detectors);
 	shapeDetectors.push_back(shape2Detectors);
-	//shapeDetectors.push_back(shape3Detectors);
-	//shapeDetectors.push_back(shape4Detectors);
-	//shapeDetectors.push_back(shape5Detectors);
+	shapeDetectors.push_back(shape3Detectors);
+	shapeDetectors.push_back(shape4Detectors);
+	shapeDetectors.push_back(shape5Detectors);
 
-//changed that
+//Currently there are only 18 min 23 max images in any given flower shape. Alter the max of i and j if you want to go through only some of these shapes.
+//Features can be taken out and switched in any order.
 	for(int i = 0; i < 2; i++){
 		for(int j = 0; j < 10; j++){
 			for(int x = 0; x < (int)shapeDetectors.size(); x++){
@@ -47,20 +48,19 @@ int main()
 						//double tmpk = shapeDetectors[x].back().extractNumberOfHullNodes();
 
 						shapeDetectors[x].back().addFeature(tmpa);
-		//				shapeDetectors[x].back().addFeature(tmpb);
+						//shapeDetectors[x].back().addFeature(tmpb);
 						shapeDetectors[x].back().addFeature(tmpc);
-		//				shapeDetectors[x].back().addFeature(tmpd);
+						//shapeDetectors[x].back().addFeature(tmpd);
 						shapeDetectors[x].back().addFeature(tmpe);
 						shapeDetectors[x].back().addFeature(tmpf);
-		//				shapeDetectors[x].back().addFeature(tmpg);
-		//				shapeDetectors[x].back().addFeature(tmph);
-		//				shapeDetectors[x].back().addFeature(tmpi);
-		//				shapeDetectors[x].back().addFeature(tmpj);
-		//				shapeDetectors[x].back().addFeature(tmpk);
+						//shapeDetectors[x].back().addFeature(tmpg);
+						//shapeDetectors[x].back().addFeature(tmph);
+						//shapeDetectors[x].back().addFeature(tmpi);
+						//shapeDetectors[x].back().addFeature(tmpj);
+						//shapeDetectors[x].back().addFeature(tmpk);
 					}
 				}
 				else{
-					//delete shapeDetectors[x][count];
 					shapeDetectors[x].pop_back();	
 					cout << "file could not be initialized" << endl;
 				}
@@ -75,26 +75,20 @@ int main()
 	for(unsigned i = 0; i < shapeDetectors.front().front().features.size(); i++)
 		maximums.push_back(0);
 	
-	//cout << "check 1" << endl;
 	for(unsigned a = 0; a < shapeDetectors.size(); a++)
 	{
-		//cout << "check a " << a << endl;
 		for(unsigned b = 0; b < shapeDetectors[a].size(); b++)
 		{
-			//cout << "check b " << b << endl;
 			if(shapeDetectors[a][b].features.size() < maximums.size())
 				cout << "shape " << a + 1 << " image " << b << " was invalid" << endl;
 			else{
 				for(unsigned c = 0; c < maximums.size(); c++){
-					//cout << "check c " << c << endl;
 					if(maximums[c] < shapeDetectors[a][b].features[c])
 						maximums[c] = shapeDetectors[a][b].features[c];
 				}
 			}
 		}
 	}
-
-	//cout << "check2" << endl;
 
 	for(unsigned a = 0; a < shapeDetectors.size(); a++){
 		for(unsigned b = 0; b < shapeDetectors[a].size(); b++){

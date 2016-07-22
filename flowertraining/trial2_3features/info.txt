@@ -1,0 +1,8 @@
+2 images from each shape was used with a total of 10 images.
+Model1 was created using non-normalized values
+Model2 was created using normalized values between 0-1
+The following features were used:
+
+1. areaOfCircles
+2. areaOfBoundHull
+3. SkeletonLength

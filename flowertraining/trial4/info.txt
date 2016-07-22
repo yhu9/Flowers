@@ -1,0 +1,34 @@
+For this testing set the I tried to include all the features and test all the shapes with the learning and classification process using the svm program. The important points about this set of tests can be summarized as follows
+
+1. All the shapes are used
+2. All the shapes are tested
+3. about 15-20 images are included
+4. about 70-75 images are discluded
+5. all tests will use the same images in the learning process
+
+It is possible that the over abundance of discluded images may enroach into the territory of included images if some of the discluded images have similar features to the included images. My biggest worry is that some of the features are simply not very informative features and could change the results of the classfication process. It may be possible that using less but more informative features would produce better results. If that is the case then the results from trial 4 should have a lower error percentage.
+
+The following are the features included in this set.
+1. AreaOfCircles
+2. Area of bounding rectangle
+3. area of bounding hull
+4. hull length
+5. skeleton length
+6. average degree of skeleton
+7. average angle of skeleton
+8. area of first circle
+9. degree of first circle
+10. number of skeleton nodes
+11. number of hull nodes
+
+On a side note, A few features that might be beneficial to add.
+
+1. ratio of circles with a degree higher than the average
+2. ratio of circles with an area higher than the average
+3. ratio of area of circles to area of hull
+4. ratio of hull length vs skeleton length
+5. length of minimum spanning tree (mst) for shape
+6. ratio of mst and skeleton lengths
+7. ratio of area of first circle and average
+8. ratio of number of circles with a degree of 1 to all circles on skeleton
+9. ratio of number of circles with a degree of 2 to all circles

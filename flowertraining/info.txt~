@@ -1,0 +1,13 @@
+A summary for all the trials done.
+
+Trial 1:
+
+	This trial was highly unsuccessful. The test could not classify any images to be within the learned area. Only 10 images were used and only 2 images were used for the test. A better trial with more data may be necessary. The problem may also lie in the fact that the features were not normalized between 0-1 as they are in the examples given in the svm_light website.
+
+Trial 2:
+
+	The results of this trial were also hight unsuccessful even after normalizing the values between 0-1. The same situation was in the previous trial where only 2 images were used for the test and 10 images were used for the learning. Perhaps the error is coming from the amount of data in the inclusion process.
+
+Trial 3:
+	
+	Trial 3 turned out to be quite successful. This time I only worked with 2 shapes, shape1 and shape2. I used shape1 for the inclusion process and shape2 was in the exclusion for the learning. I had 2 tests and both gave an error rate less than 20% and was able to classify shapes within and out of the included shapes (finally). Test1 was done using all the same images in the learning process. Test2 took out half of the shapes and used the other half for classification to see if it was still possible to classify images that were not part of the learned set.

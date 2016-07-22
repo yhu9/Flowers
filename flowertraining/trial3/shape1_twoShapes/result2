@@ -1,0 +1,43 @@
+masa@masa-Lenovo-V570:~/Programs/svm_light$ ./svm_classify trial4/2shapes/testing2 trial4/2shapes/model2 trial4/2shapes/result2
+Reading model...OK. (22 support vectors read)
+Classifying test examples..done
+Runtime (without IO) in cpu-seconds: 0.00
+Accuracy on test set: 88.89% (32 correct, 4 incorrect, 36 total)
+Precision/recall on test set: 94.12%/84.21%
+
+1.3947029
+1.2090966
+0.79176399
+1.1587708
+1.4300883
+0.75629139
+1.3853787
+0.76920201
+-0.010563488
+1
+-1.1329364
+0.21578493
+0.2524067
+-1.1353986
+0.61836248
+0.70171042
+1.2665798
+1.0253411
+1.2268601
+-0.62174885
+-0.99999999
+-0.14039315
+-0.20140316
+-0.20849228
+-0.058498101
+0.49871438
+-1.1511091
+-0.77423626
+-0.73149972
+-1.220221
+-1.5006238
+-1.4189777
+-0.99447925
+-1.0109897
+-1.3551162
+-0.71974693

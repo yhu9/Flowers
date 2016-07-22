@@ -1,0 +1,7 @@
+Features include the following. Values are non-normalized. 2 images from each shape is used with a total of 10 shapes.
+
+1. areaOfCircles
+2. areaOfBoundingHull
+3. SkeletonLength 
+4. numberOfSkeletonNodes
+5. numberOfHullNodes
