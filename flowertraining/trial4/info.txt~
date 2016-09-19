@@ -2,8 +2,8 @@ For this testing set the I tried to include all the features and test all the sh
 
 1. All the shapes are used
 2. All the shapes are tested
-3. about 15-20 images are included from shape to be included
-4. about 15-20 images discluded from other shapes
+3. about 15-20 images are included
+4. about 70-75 images are discluded
 5. all tests will use the same images in the learning process due to the lack of images in our set.
 
 It is possible that the over abundance of discluded images may enroach into the territory of included images if some of the discluded images have similar features to the included images. My biggest worry is that some of the features are simply not very informative features and could change the results of the classfication process. It may be possible that using less but more informative features would produce better results. If that is the case then the results from trial 4 should have a lower error percentage.

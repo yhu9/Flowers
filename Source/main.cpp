@@ -36,28 +36,28 @@ int main()
 						shapeDetectors[x].back().drawSkeleton(2);
 						shapeDetectors[x].back().showShape(1);
 						double tmpa = shapeDetectors[x].back().extractAreaOfCircles();
-						//double tmpb = shapeDetectors[x].back().extractAreaOfBoundRect();
+						double tmpb = shapeDetectors[x].back().extractAreaOfBoundRect();
 						double tmpc = shapeDetectors[x].back().extractAreaOfBoundHull();
-						//double tmpd = shapeDetectors[x].back().extractHullLength();
+						double tmpd = shapeDetectors[x].back().extractHullLength();
 						double tmpe = shapeDetectors[x].back().extractSkeletonLength();
 						double tmpf = shapeDetectors[x].back().extractAverageDegree();
-						//double tmpg = shapeDetectors[x].back().extractAverageAngle();
-						//double tmph = shapeDetectors[x].back().extractAreaOfFirstCircle();
-						//double tmpi = shapeDetectors[x].back().extractDegreeOfFirstCircle();
-						//double tmpj = shapeDetectors[x].back().extractNumberOfSkeletonNodes();
-						//double tmpk = shapeDetectors[x].back().extractNumberOfHullNodes();
+						double tmpg = shapeDetectors[x].back().extractAverageAngle();
+						double tmph = shapeDetectors[x].back().extractAreaOfFirstCircle();
+						double tmpi = shapeDetectors[x].back().extractDegreeOfFirstCircle();
+						double tmpj = shapeDetectors[x].back().extractNumberOfSkeletonNodes();
+						double tmpk = shapeDetectors[x].back().extractNumberOfHullNodes();
 
 						shapeDetectors[x].back().addFeature(tmpa);
-						//shapeDetectors[x].back().addFeature(tmpb);
+						shapeDetectors[x].back().addFeature(tmpb);
 						shapeDetectors[x].back().addFeature(tmpc);
-						//shapeDetectors[x].back().addFeature(tmpd);
+						shapeDetectors[x].back().addFeature(tmpd);
 						shapeDetectors[x].back().addFeature(tmpe);
 						shapeDetectors[x].back().addFeature(tmpf);
-						//shapeDetectors[x].back().addFeature(tmpg);
-						//shapeDetectors[x].back().addFeature(tmph);
-						//shapeDetectors[x].back().addFeature(tmpi);
-						//shapeDetectors[x].back().addFeature(tmpj);
-						//shapeDetectors[x].back().addFeature(tmpk);
+						shapeDetectors[x].back().addFeature(tmpg);
+						shapeDetectors[x].back().addFeature(tmph);
+						shapeDetectors[x].back().addFeature(tmpi);
+						shapeDetectors[x].back().addFeature(tmpj);
+						shapeDetectors[x].back().addFeature(tmpk);
 					}
 				}
 				else{
@@ -70,7 +70,8 @@ int main()
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //make features relative to each other.
-
+//Seems completely unnecessary.
+/*
 	vector<double> maximums;
 	for(unsigned i = 0; i < shapeDetectors.front().front().features.size(); i++)
 		maximums.push_back(0);
@@ -89,6 +90,8 @@ int main()
 			}
 		}
 	}
+*/
+//Will keep for now but this feature is bound to be deleted and erased.
 
 	for(unsigned a = 0; a < shapeDetectors.size(); a++){
 		for(unsigned b = 0; b < shapeDetectors[a].size(); b++){

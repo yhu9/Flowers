@@ -60,10 +60,18 @@ public:
         double extractNumberOfSkeletonNodes();	//complete
         double extractHullLength();				//complete
         double extractSkeletonLength();			//complete
-        double extractAverageDegree();			//complete
+        double extractAverageDegree();			//in-progress
         double extractAverageAngle();			//complete
         double extractAreaOfFirstCircle();		//complete
         double extractDegreeOfFirstCircle();	//complete
+		double extractRatioCircleDegreeLarge;
+		double extractRatioCircleAreaLarge;
+		double extractRatioCircleAreaHullArea;
+		double extractRatioHullLengthSkeletonLength;
+		double extractLengthOfShapeMST;
+		double extractRatioOfSkeletonLengthMST;
+		double extractRatioAreaOfFirstCircleAndAverageArea;
+		double extractRatioOfCirclesWithDegreeGreaterThan2;
 		void addFeature(double);
 		vector<Circle> getCircles();
 

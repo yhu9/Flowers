@@ -719,6 +719,54 @@ double MyFeatureDetector::extractDegreeOfFirstCircle(){
     return total;
 }
 
+double MyFeatureDetector::extractRatioCircleDegreeLarge(){
+	double total;
+
+	return total;
+}
+
+double MyFeatureDetector::extractRatioCircleAreaLarge(){
+	double total;
+
+	return total;
+}
+
+double MyFeatureDetector::extractRatioCircleAreaHullArea(){
+	double total;
+
+	return total;
+}
+
+double MyFeatureDetector::extractRatioHullLengthSkeletonLength(){
+	double total;
+
+	return total;
+}
+
+double MyFeatureDetector::extractLengthOfShapeMST(){
+	double total;
+
+	return total;
+}
+
+double MyFeatureDetector::extractRatioOfSkeletonLengthMST(){
+	double total;
+
+	return total;
+}
+
+double MyFeatureDetector::extractRatioAreaOfFirstCircleAndAverageArea(){
+	double total;
+
+	return total;
+}
+
+double MyFeatureDetector::extractRatioOfCirclesWithDegreeGreaterThan2(){
+	double total;
+
+	return total;
+}
+
 void MyFeatureDetector::printSkeletonMap()
 {
 	for(unsigned a = 0; a < skeletonMap.size(); a++)

@@ -3,8 +3,8 @@ Results could be skewed for result2 due to the fact that the training file is th
 Results
 1. As previously thought, including more vectors did in fact improve the results by a significant amount.
 2. There is over 80% accuracy with the tests.
-3. result2 had an accuracy of over 90% when using the same images used for the learning process on shape1.
-4. result2b had an accuracy of over 80% when using images that were not in the learning process on shape2.
+3. result2 had an accuracy of over 90% when using the same images used for the learning process
+4. result2b had an accuracy of over 80% when using images that were not in the learning process.
 
 Conclusion
 
