@@ -457,7 +457,7 @@ bool MyTools::doesIntersect(Mat img1, Mat img2)
 }
 
 //Tools to transform shape or point post processing
-Point MyTools::jitterCircle(Point c, double radius, Mat shape)
+Point MyTools::jitterCircle(Point c, double radius, double jitterDegree, Mat shape)
 {
     Mat circle_img;
     int x = c.x;
@@ -466,8 +466,8 @@ Point MyTools::jitterCircle(Point c, double radius, Mat shape)
 
     for(double radian = 0; radian < 6.2; radian+=0.1)
     {
-        c.x = x + 3 * cos(radian);
-        c.y = y + 3 * sin(radian);
+        c.x = x + jitterDegree * cos(radian);
+        c.y = y + jitterDegree * sin(radian);
 
         circle(circle_img,c,radius,Scalar(255,255,255),1,8);
         if(doesIntersect(shape,circle_img))
@@ -517,10 +517,6 @@ Point MyTools::jitterCircle(Point c, double radius, Point c2, double radius2, Ma
         double y2 = (radius + radius2) * sin(radians) + c.y;
         Point pt = Point(x2,y2);
 
-        //line(img, pt, c, Scalar(255,255,255), 2, 8);
-        //line(img, pt, c2, Scalar(255,255,255), 2, 8);
-        //imshow("",img);
-        //waitKey(0);
         circle(circle_img, pt, radius2, Scalar(255,255,255), 1, 8);
         if(doesIntersect(shape,circle_img))
                 ; 

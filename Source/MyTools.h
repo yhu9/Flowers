@@ -82,6 +82,7 @@ public:
 	vector<Point> randomize(vector<Point> set);
 	
 	//Complex image processing tools
-	Point jitterCircle(Point c, double radius, Mat shape);
-        Point jitterCircle(Point c, double radius, Point c2, double radius2, Mat shape);
+	Point jitterCircle(Point c, double radius, double jitterDegree, Mat shape);
+	Point jitterCircle(Point c, double radius, Point c2, double radius2, Mat shape);
+
 };

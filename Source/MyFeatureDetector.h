@@ -20,7 +20,7 @@ public:
 	void test(char*);
 	void exit();
 
-	bool init(char*);
+	bool init(char*, bool flag);
 	//vector<Point> addCircle(int setid,int cid, vector<Point> pointSet);
 
 	///////////////////////////////////////////////////////////////////////////
@@ -41,7 +41,7 @@ private:
         //final shape structs
         Circle bCirc;
         Rect bRect;
-        vector<int> hull;
+        vector<int> hull;					//hull gives index of node in pSet
         vector<Circle> circles;
         
         //structures
@@ -56,22 +56,38 @@ public:
         double extractAreaOfCircles();          //complete
         double extractAreaOfBoundRect();		//complete
         double extractAreaOfBoundHull();		//complete
-        double extractNumberOfHullNodes();		//complete
+        
+		double extractAreaOfFirstCircle();		//complete
+		double extractDegreeOfFirstCircle();	//complete
+
+		double extractNumberOfHullNodes();		//complete
         double extractNumberOfSkeletonNodes();	//complete
-        double extractHullLength();				//complete
+        double extractNumberOfMSTNodes();		//complete
+		
+		double extractHullLength();				//complete
         double extractSkeletonLength();			//complete
-        double extractAverageDegree();			//in-progress
-        double extractAverageAngle();			//complete
-        double extractAreaOfFirstCircle();		//complete
-        double extractDegreeOfFirstCircle();	//complete
-		double extractRatioCircleDegreeLarge;
-		double extractRatioCircleAreaLarge;
-		double extractRatioCircleAreaHullArea;
-		double extractRatioHullLengthSkeletonLength;
-		double extractLengthOfShapeMST;
-		double extractRatioOfSkeletonLengthMST;
-		double extractRatioAreaOfFirstCircleAndAverageArea;
-		double extractRatioOfCirclesWithDegreeGreaterThan2;
+		double extractMSTLength();				//complete
+
+        double extractAverageDegreeOfSkeleton();			//complete
+		double extractAverageAreaOfCircles();				//complete
+		double extractAverageDegreeOfMST();				//obviously 2?
+		//double extractAverageDegreeOfHull();				//obviously 2
+
+        double extractAverageAngleOfSkeleton();			//complete
+		double extractAverageAngleOfMST();				//complete
+		double extractAverageAngleOfHull();				//complete
+
+		double extractRatioSkeletonDegreeLarge();		//complete
+		double extractRatioMSTDegreeLarge();			//complete
+		double extractRatioSkeletonAreaLarge();			//complete
+
+		double extractRatioCircleAreaHullArea();		//complete
+		double extractRatioHullLengthSkeletonLength();	//complete
+		double extractRatioHullLengthMSTLength();		//complete
+		double extractRatioMSTLengthSkeletonLength();	//complete
+		double extractRatioAreaOfFirstCircleAndAverageAreaOfSkeleton();		//complete
+		double extractRatioDegreeOfFirstCircleAndAverageDegreeOfSkeleton();	//complete
+		
 		void addFeature(double);
 		vector<Circle> getCircles();
 

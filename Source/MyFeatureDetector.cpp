@@ -16,7 +16,7 @@ void MyFeatureDetector::test(char* imgname)
 
 }
 
-bool MyFeatureDetector::init(char* imgname)
+bool MyFeatureDetector::init(char* imgname, bool flag)
 {
     MyTools tools;
     //Initialize the image
@@ -41,19 +41,20 @@ bool MyFeatureDetector::init(char* imgname)
         //Run Canny which highlights the verticies of the shape
         blur(shapes, detectedEdges, Size(3,3));
 
-        Canny(detectedEdges,detectedEdges,50,150,3);
+		if(flag == 1)
+		{
+			namedWindow("blurred shape", CV_WINDOW_FREERATIO);
+			imshow("blurred shape",detectedEdges);
+			waitKey(0);
+		}
+		Canny(detectedEdges,detectedEdges,50,150,3);
 
-        //If you want to see the raw, blured, and detected edges
-        //////////////////////////////////////////////////////////////////////////////////////////////////
-        //namedWindow("raw image", CV_WINDOW_FREERATIO);						//
-        //imshow("raw image", shapes);									//
-        //namedWindow("blured image", CV_WINDOW_FREERATIO);						//
-        //imshow("blured image", detectedEdges);							//
-        //namedWindow("detected edges", CV_WINDOW_FREERATIO);						//
-        //imshow("detected edges", detectedEdges);							//
-        //waitKey(0);											//
-        //cout << "canny run successfully" << endl;							//
-        //////////////////////////////////////////////////////////////////////////////////////////////////
+		if(flag == 1)
+		{
+			namedWindow("detected edges", CV_WINDOW_FREERATIO);
+			imshow("detected edges", detectedEdges);
+			waitKey(0);
+		}
 
         //Finds contours of the image
         //Basically verticies that are next to each other.
@@ -69,10 +70,31 @@ bool MyFeatureDetector::init(char* imgname)
 
 //offset – Optional offset by which every contour point is shifted. This is useful if the contours are extracted from the image ROI and then they should be analyzed in the whole  
         findContours(detectedEdges,contours,heirarchy,CV_RETR_LIST,CV_CHAIN_APPROX_SIMPLE,Point());
-        //cout << "contours found" << endl;
+
+		if(flag ==1)
+		{
+			Mat foundContours = Mat::zeros(shapes.size(), CV_8U);
+			for(unsigned a = 0; a < contours.size(); a++)
+				for(unsigned b = 0; b < contours[a].size(); b++)
+					circle(foundContours,contours[a][b],1,Scalar(255,255,255), -1, 8);
+			namedWindow("findContour", CV_WINDOW_FREERATIO);
+			imshow("findContour",foundContours);
+			waitKey(0);
+		}
 
         //remove outliers
         contours = tools.removeOutliers(contours);
+
+		if(flag == 1)
+		{
+			Mat outliersRemoved = Mat::zeros(shapes.size(), CV_8U);
+			for(unsigned a = 0; a < contours.size(); a++)
+				for(unsigned b = 0; b < contours[a].size(); b++)
+					circle(outliersRemoved,contours[a][b],1,Scalar(255,255,255),-1,8);
+			namedWindow("outliers removed", CV_WINDOW_FREERATIO);
+			imshow("outliers removed", outliersRemoved);
+			waitKey(0);
+		}
 
         //Draw contour on drawing
         for(unsigned i = 0; i < contours.size(); i++)
@@ -93,7 +115,15 @@ bool MyFeatureDetector::init(char* imgname)
         //we do not use variable contours anymore
         //cout << "set size: " << pSet.size() << endl;
         pSet = tools.reduction(pSet,12); //12 = radius of reduction size
-        //cout << "set reduced to: " << pSet.size() << endl;
+		if(flag == 1)
+		{
+			Mat simplified = Mat::zeros(shapes.size(), CV_8U);
+			for(unsigned a = 0; a < pSet.size(); a ++)
+				circle(simplified, *pSet[a], 1, Scalar(255,255,255), -1, 8);
+			namedWindow("simplified", CV_WINDOW_FREERATIO);
+			imshow("simplified", simplified);
+			waitKey(0);
+		}
 
         //Create the nodes based on pSet
         //We also intialize the id of each node
@@ -118,11 +148,17 @@ bool MyFeatureDetector::init(char* imgname)
             for(unsigned j=0; j < maps[i]->edge.size(); j++)
                 line(reducedImage,maps[i]->pt,maps[i]->edge[j]->pt,Scalar(255,255,255),2,8);
         }
-        //cout << "image drawn on reduced set" << endl;
 
-        //Close the shape
-        tools.closeImage(maps,reducedImage);
+		if(flag == 1)
+		{
+			namedWindow("mapped mst", CV_WINDOW_FREERATIO);
+			imshow("mapped mst", reducedImage);
+			waitKey(0);
+		}
 
+		//attempt to close the shape
+		tools.closeImage(maps,reducedImage);
+		
         //create temp vector
         for(int i = 0; i < (int)pSet.size(); i++)
             pointSet.push_back(Point(pSet[i]->x,pSet[i]->y));
@@ -216,9 +252,13 @@ Mat MyFeatureDetector::drawSet(vector<int> set)
 //jittering the circle returns a point where the circle does not intersect any part of the shape.
 Circle MyFeatureDetector::insertCircle(Mat shape, Point seed)
 {
+	double jitterAmount = 3;
     while(tools.isOn(seed,shape))
-        tools.jitterCircle(seed,5, shape);
-    //bool isInside = tools.isInside(seed,shapes);
+	{
+        seed = tools.jitterCircle(seed,2,jitterAmount,shape);
+		jitterAmount +=2;
+	}
+	//bool isInside = tools.isInside(seed,shapes);
     bool isInside2 = tools.isInside2(seed,shapes);
     if(isInside2 == false){
         Circle falseCircle;
@@ -244,13 +284,8 @@ Circle MyFeatureDetector::insertCircle(Mat shape, Point seed)
             t = tools.doesIntersect(shape, circle_img);
         }while(!t);
 
-        temp = tools.jitterCircle(seed, radius,shape);
+        temp = tools.jitterCircle(seed, radius,3,shape);
 		
-       // if(!tools.isInside2(temp, shape))
-        //{
-          //  myCircle.radius = -1;
-            //return myCircle;
-        //}
         if(temp.x == seed.x && temp.y == seed.y)
         {
             largestCircle = true;
@@ -268,6 +303,17 @@ Circle MyFeatureDetector::insertCircle(Mat shape, Point seed)
     return myCircle;
 }
 
+//InsertCircle2 does things much differently.
+//1. You can only insert circles with a prev circle
+//2. A seed point from the previous circle must be specified to grow from
+//3. To grow a normalized vector from the previous circle to the seed point is drawn
+//4. The center of the circle is moved in the direction of the vector and the radius of the circle is grown
+// at the same and at the same rate to ensure that the growing circle is in contact with the prev circle.
+//5. Once the growing circle meets another edge, the circle is jittered along the edges of the previous circle
+// until it does not intersect with it.
+//6. The circle is then grown again.
+//7. This process repeates until jittering the circle does not stop an intersection between the circle and an edge
+//8. That circle is returned.
 Circle MyFeatureDetector::insertCircle2(Mat shape, Circle prev, Point seed)
 {
     //namedWindow("circle img", CV_WINDOW_FREERATIO);
@@ -347,6 +393,11 @@ Circle MyFeatureDetector::insertCircle2(Mat shape, Circle prev, Point seed)
             else
                 new_center_pt = temppt;
         }
+		else
+		{
+			myCircle.radius = -1;
+			return myCircle;
+		}
     }
 
     myCircle.center = new_center_pt;
@@ -382,17 +433,17 @@ struct fooSortCircle
 
 void MyFeatureDetector::drawCircle2()
 {
-    //namedWindow("my circle", CV_WINDOW_FREERATIO);
     Mat newShape = Mat::zeros(shapes.size(),CV_8U);
     newShape = newShape | shapes;
     Point seed = tools.findCentroid(pSet);
 	deque<Circle> que;
 
-	if(tools.isInside2(seed, newShape)){
+	if(tools.isInside2(seed, newShape) || tools.isInside(seed,newShape)){
 		Circle firstCircle = insertCircle(newShape, seed);
 		if(firstCircle.radius > 0)
 			que.push_back(firstCircle);
 	}
+
 	//we start by sorting the solution every single time. But, an alternative solution is possible
 	//when we push new circle into the que,
 	//pick a random spot on the que
@@ -417,12 +468,6 @@ void MyFeatureDetector::drawCircle2()
 		circle(tempCircle,myCircle.center, myCircle.radius * 0.60, Scalar(255,255,255),1,8);
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
-        //cout << "intersection.size(): " << intersections.size() << endl;
-        //Mat my_circle = Mat::zeros(newShape.size(), CV_8U);
-        //my_circle = myCircle.shape | newShape;
-        //imshow("my circle", my_circle);
-        //waitKey(0);
-        ////////////////////////////////////////////////////////////////////////////////////////////////
         //
         //double check to be sure next circle is not on the newShape at all
 		//intersections.size() > 1 checks to make sure the circle does touch the shape somewhere
@@ -433,46 +478,6 @@ void MyFeatureDetector::drawCircle2()
 			
             circles.push_back(myCircle);
             
-			//Turns out It's actually better to just pick fixed points to grow from instead of doing the more complex way.
-			//The complex way:
-			//1. find intersections between circle and shape
-			//2. find angle of ray created by center of circle and intersections
-			//3. normalize the values between 0-360
-			//4. find the middle angle of two adjacent rays
-			//5. push those as seeds to grow from
-			//
-			//The simple way:
-			//1. pick 6 spots to grow from between 0-360 evenly spaced out
-			//2. push those as seeds to grow from
-			/*
-			vector<double> radii;
-            for(unsigned i = 0; i < intersections.size(); i++)
-            {
-                radii.push_back(tools.findAngleOfRay(myCircle.center,intersections[i]));
-                //http://stackoverflow.com/questions/1311049/how-to-map-atan2-to-degrees-0-360
-                radii[i] = ((int)radii[i] + 360) % 360;
-            }
-
-            //sort radii after converting everything to positive values
-            sort(radii.begin(),radii.end());
-
-            //find the averageDegree of radii
-			
-            double averageDegree = 0;
-            for(int i = 0; i < (int)radii.size(); i++)
-            {
-                int j = (i + 1) % (int)radii.size();
-                if(j < i)
-                    averageDegree += abs(radii[j] + 360 - radii[i]);
-                else
-                    averageDegree += abs(radii[j] - radii[i]);
-            }
-            averageDegree = averageDegree / radii.size();
-			*/
-            //Find the midpoint of the arcs. 
-			//if there are less than 3 arcs or the arcs are greater than the average degree, don't do it
-			//push the found midpoints into seeds to start growth from.
-			//turns out growing from fixed points gives better results than growing from midpoints of arcs.
             vector<Point> seeds;
 			for(double i = 1; i <= 7; i++)
 			{
@@ -481,40 +486,6 @@ void MyFeatureDetector::drawCircle2()
 				Point pt = Point(x,y);
 				seeds.push_back(pt);
 			}
-			/*
-            for(int i = 0; i < (int)radii.size(); i++)
-            {
-                int j = (i + 1) % (int)radii.size();
-                double theta = 0;
-                double diff = 0;
-                //if radii[j] < radii[i]
-                if(j < i)
-                    diff = radii[j] + 360 - radii[i];
-                else
-                    diff = radii[j] - radii[i];
-                if(!(radii.size() > 2 && diff < averageDegree))
-                {
-                    theta = radii[i] + diff / 2;
-                    //Point to start circle growth from
-                    theta = theta /180 * 3.141592653;
-                    double x = myCircle.center.x + (myCircle.radius) * cos(theta);
-                    double y = myCircle.center.y + (myCircle.radius) * sin(theta);
-                    Point pt = Point(x,y);
-
-                    seeds.push_back(pt);
-                }
-            }
-			*/
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////
-            //cout << "seeds.size(): " << seeds.size() << endl;
-            //Mat my_circle = Mat::zeros(newShape.size(), CV_8U);
-            //my_circle = newShape | my_circle | myCircle.shape;
-            //for(unsigned i = 0; i < seeds.size(); i++)
-            //    circle(my_circle, seeds[i], 5, Scalar(255,255,255), -1, 8); 
-            //imshow("my circle", my_circle);
-            //waitKey(1);
-            ////////////////////////////////////////////////////////////////////////////////////////////////
 
             //while seeds > 0 pop a seed from the set and grow a circle from there.
             //If the circle is valid push it into the que.
@@ -525,26 +496,13 @@ void MyFeatureDetector::drawCircle2()
                 seeds.pop_back();
 
                 Circle c = insertCircle2(newShape, myCircle, seed);
-                ////////////////////////////////////////////////////////////////////////////////////////////////
-                //my_circle = Mat::zeros(my_circle.size(), CV_8U);    
-                //my_circle = newShape | my_circle;
-                //circle(my_circle, c.center, c.radius, Scalar(255,255,255), 1, 8);
-                //imshow("my circle", my_circle);
-                //    waitKey(0);
-                ////////////////////////////////////////////////////////////////////////////////////////////////  
+                
+				////////////////////////////////////////////////////////////////////////////////////////////////  
 				//alternative sorting solution possible for speed of program
                 if(c.radius != -1 && c.radius < newShape.cols)
                     if(!tools.isOn(c.center, newShape) && !tools.isOn(c.center, myCircle.shape))
 					{
-						//bool duplicate = false;
-						//for(unsigned j = que.size(); j > que.size() - (unsigned)count && j > 0; j--)
-						//{
-						//	if(tools.doesIntersect(c.shape, que[j - 1].shape))
-						//		duplicate = true;
-						//}
-						//if(duplicate == false)
 							que.push_back(c);
-						//duplicate = false;
 					}
             }//end while
 
@@ -646,6 +604,10 @@ double MyFeatureDetector::extractNumberOfHullNodes(){
     return (double)hull.size();
 }
 
+double MyFeatureDetector::extractNumberOfMSTNodes(){
+	return (double)maps.size();
+}
+
 double MyFeatureDetector::extractHullLength(){
     double total = 0.0;
     for(int i = 0; i < (int)hull.size(); i++){
@@ -670,13 +632,149 @@ double MyFeatureDetector::extractSkeletonLength(){
     return total;
 }
 
-double MyFeatureDetector::extractAverageDegree(){
+double MyFeatureDetector::extractAverageDegreeOfSkeleton(){
     double total = 0.0;
     for(unsigned i = 0; i < skeletonMap.size(); i++){
         total += (double)skeletonMap[i]->edge.size();
     }
     total = total / (double) skeletonMap.size();
     return total;
+}
+
+double MyFeatureDetector::extractAverageDegreeOfMST(){
+	double total = 0;
+	for(unsigned a = 0; a < maps.size(); a++)
+		total  += (double)maps[a]->edge.size();
+
+	return total / (double)maps.size();
+}
+
+double MyFeatureDetector::extractAverageAreaOfCircles(){
+	double total = 0;
+	for(unsigned a = 0; a < circles.size(); a++)
+		total += circles[a].calcArea();
+
+	return total / (double)circles.size();
+}
+
+double MyFeatureDetector::extractAreaOfFirstCircle(){
+    double total = circles[0].calcArea();
+    return total;
+}
+
+double MyFeatureDetector::extractDegreeOfFirstCircle(){
+    double total = (double)skeletonMap[0]->edge.size();
+    return total;
+}
+
+double MyFeatureDetector::extractRatioSkeletonDegreeLarge(){
+	double total = 0;
+	double ratio = 0;
+	double average = 0;
+	for(unsigned a = 0; a < skeletonMap.size(); a++)
+		total+= skeletonMap[a]->edge.size();
+
+	average = total / (double)skeletonMap.size();
+
+	double numerator; double denominator;
+	for(unsigned a = 0; a < skeletonMap.size(); a++)
+	{
+		if((double)skeletonMap[a]->edge.size() >= average)
+			numerator += 1;
+		else
+			denominator += 1;
+	}
+
+	ratio = numerator / denominator;
+	return ratio;
+}
+
+double MyFeatureDetector::extractRatioMSTDegreeLarge(){
+	double total = 0;
+	double average = 0;
+	for(unsigned a = 0; a < maps.size(); a++)
+		total += maps[a]->edge.size();
+	
+	average = total / (double)maps.size();
+	
+	double numerator; double denominator;
+	for(unsigned a = 0; a < maps.size(); a++)
+	{
+		if((double)maps[a]->edge.size() >= average)
+			numerator += 1;
+		else
+			denominator += 1;
+	}
+
+	return numerator / denominator;
+}
+
+double MyFeatureDetector::extractRatioSkeletonAreaLarge(){
+	double total = 0;
+	double average = 0;
+
+	for(unsigned a = 0; a < circles.size(); a++)
+		total += circles[a].calcArea();
+	average = total / (double)circles.size();
+	
+	double numerator; double denominator;
+	for(unsigned a = 0; a < circles.size(); a++)
+		if(circles[a].calcArea() >= average)
+			numerator++;
+		else
+			denominator++;
+
+	return numerator / denominator;
+}
+
+double MyFeatureDetector::extractRatioCircleAreaHullArea(){
+	return extractAreaOfCircles() / extractAreaOfBoundHull();
+}
+
+double MyFeatureDetector::extractRatioHullLengthSkeletonLength(){
+
+	return extractHullLength() / extractSkeletonLength();
+}
+
+double MyFeatureDetector::extractMSTLength(){
+	double total = 0;
+	for(unsigned a = 0; a < pSet.size(); a++)
+	{
+		for(unsigned b = 0; b < maps[a]->edge.size(); b++)
+			total += tools.findDistance(maps[a]->pt, maps[a]->edge[b]->pt); 
+	}
+
+	return total;
+}
+
+double MyFeatureDetector::extractRatioMSTLengthSkeletonLength(){
+	return extractMSTLength() / extractSkeletonLength();
+}
+
+double MyFeatureDetector::extractRatioHullLengthMSTLength(){
+	return extractHullLength() / extractMSTLength();
+}
+
+double MyFeatureDetector::extractRatioAreaOfFirstCircleAndAverageAreaOfSkeleton(){
+	return extractAreaOfFirstCircle() / extractAverageAreaOfCircles();
+}
+
+double MyFeatureDetector::extractRatioDegreeOfFirstCircleAndAverageDegreeOfSkeleton(){
+	return extractDegreeOfFirstCircle() / extractAverageDegreeOfSkeleton();
+}
+
+
+void MyFeatureDetector::printSkeletonMap()
+{
+	for(unsigned a = 0; a < skeletonMap.size(); a++)
+	{
+		for(unsigned b = 0; b < skeletonMap[a]->edge.size(); b++)
+		{
+			Point p1 = skeletonMap[a]->pt;
+			Point p2 = skeletonMap[a]->edge[b]->pt;
+			cout << p1.x << "_" << p1.y << "," << p2.x << "_" << p2.y << "," << tools.findDistance(p1,p2) << endl;
+		}
+	}
 }
 
 //Feature extracts the average angle between three points less than 180 degrees inclusive.
@@ -686,7 +784,7 @@ double MyFeatureDetector::extractAverageDegree(){
 //4. normalize the angles between 0-360
 //5. find the angular distance of both rays
 //6. find the average? or maybe some other statistical value could be better? only way to know for sure is to graph it all.
-double MyFeatureDetector::extractAverageAngle(){
+double MyFeatureDetector::extractAverageAngleOfSkeleton(){
     double total = 0.0;
     double n = 0;
     for(unsigned i = 0; i < skeletonMap.size(); i++){    
@@ -709,76 +807,53 @@ double MyFeatureDetector::extractAverageAngle(){
     return total;
 }
 
-double MyFeatureDetector::extractAreaOfFirstCircle(){
-    double total = circles[0].calcArea();
-    return total;
-}
-
-double MyFeatureDetector::extractDegreeOfFirstCircle(){
-    double total = (double)skeletonMap[0]->edge.size();
-    return total;
-}
-
-double MyFeatureDetector::extractRatioCircleDegreeLarge(){
-	double total;
-
-	return total;
-}
-
-double MyFeatureDetector::extractRatioCircleAreaLarge(){
-	double total;
-
-	return total;
-}
-
-double MyFeatureDetector::extractRatioCircleAreaHullArea(){
-	double total;
-
-	return total;
-}
-
-double MyFeatureDetector::extractRatioHullLengthSkeletonLength(){
-	double total;
-
-	return total;
-}
-
-double MyFeatureDetector::extractLengthOfShapeMST(){
-	double total;
-
-	return total;
-}
-
-double MyFeatureDetector::extractRatioOfSkeletonLengthMST(){
-	double total;
-
-	return total;
-}
-
-double MyFeatureDetector::extractRatioAreaOfFirstCircleAndAverageArea(){
-	double total;
-
-	return total;
-}
-
-double MyFeatureDetector::extractRatioOfCirclesWithDegreeGreaterThan2(){
-	double total;
-
-	return total;
-}
-
-void MyFeatureDetector::printSkeletonMap()
-{
-	for(unsigned a = 0; a < skeletonMap.size(); a++)
-	{
-		for(unsigned b = 0; b < skeletonMap[a]->edge.size(); b++)
+double MyFeatureDetector::extractAverageAngleOfMST(){
+	double total = 0;
+	double n = 0;
+	for(unsigned a = 0; a < maps.size(); a++)
+		for(unsigned b = 0; b < maps[a]->edge.size() - 1 && maps[a]->edge.size() >= 2; b++)
 		{
-			Point p1 = skeletonMap[a]->pt;
-			Point p2 = skeletonMap[a]->edge[b]->pt;
-			cout << p1.x << "_" << p1.y << "," << p2.x << "_" << p2.y << "," << tools.findDistance(p1,p2) << endl;
+			Point pt1 = maps[a]->pt;
+			Point pt2 = maps[a]->edge[b]->pt;
+			Point pt3 = maps[a]->edge[b+1]->pt;
+			int degree12 = ((int)tools.findAngleOfRay(pt1,pt2) + 360) % 360;
+			int degree23 = ((int)tools.findAngleOfRay(pt1,pt3) + 360) % 360;
+
+			int angle = abs(degree12 - degree23);
+			if(angle > 180)
+				angle = abs(360 - angle);
+			total += angle;
+			n++;
 		}
-	}
+	if(n == 0)
+		return -1;
+	return (double)total / n;
 }
+
+double MyFeatureDetector::extractAverageAngleOfHull(){
+	double total = 0;
+	double n = 0;
+	for(unsigned a = 0; a < hull.size(); a++)
+	{	
+		Point pt1 = pointSet[hull[(a-1+hull.size()) % hull.size()]];
+		Point pt2 = pointSet[hull[a]];
+		Point pt3 = pointSet[hull[(a+1) % hull.size()]];
+
+		int degree12 = ((int)tools.findAngleOfRay(pt2,pt1) + 360) % 360;
+		int degree23 = ((int)tools.findAngleOfRay(pt2,pt3) + 360) % 360;
+
+		int angle = abs(degree12 - degree23);
+		if(angle > 180)
+			angle = abs(360-angle);
+		total += angle;
+		n++;
+	}
+
+	if(n==0)
+		return -1;
+	return (double)total / n;
+}
+
 
 void MyFeatureDetector::showShape(int time)
 {
