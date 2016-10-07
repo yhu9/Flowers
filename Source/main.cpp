@@ -28,36 +28,36 @@ int main()
 				fname << i; fname << j; fname << ".ppm";
 				string tmp = fname.str();
 				const char* filename = tmp.c_str();
-				if(shapeDetectors[x].back().init((char*)filename, 0) != 0)
+				if(shapeDetectors[x].back().init((char*)filename, 1) != 0)
 				{
 					shapeDetectors[x].back().drawCircle2();
 					if(shapeDetectors[x].back().getCircles().size() > 10){
 						shapeDetectors[x].back().drawSkeleton(2);
 						shapeDetectors[x].back().showShape(1);
-						double tmpa = shapeDetectors[x].back().extractAreaOfCircles();
-						double tmpb = shapeDetectors[x].back().extractAreaOfBoundRect();
-						double tmpc = shapeDetectors[x].back().extractAreaOfBoundHull();
-						double tmpd = shapeDetectors[x].back().extractHullLength();
-						double tmpe = shapeDetectors[x].back().extractSkeletonLength();
-						double tmpf = shapeDetectors[x].back().extractAverageDegreeOfSkeleton();
-						double tmpg = shapeDetectors[x].back().extractAverageAngleOfSkeleton();
-						double tmph = shapeDetectors[x].back().extractAreaOfFirstCircle();
-						double tmpi = shapeDetectors[x].back().extractDegreeOfFirstCircle();
-						double tmpj = shapeDetectors[x].back().extractNumberOfSkeletonNodes();
-						double tmpk = shapeDetectors[x].back().extractNumberOfHullNodes();
-						double tmpl = shapeDetectors[x].back().extractNumberOfMSTNodes();
-						double tmpm = shapeDetectors[x].back().extractMSTLength();
-						double tmpn = shapeDetectors[x].back().extractAverageAreaOfCircles();
-						double tmpo = shapeDetectors[x].back().extractAverageAngleOfMST();
-						double tmpp = shapeDetectors[x].back().extractAverageAngleOfHull();
-						double tmpq = shapeDetectors[x].back().extractRatioSkeletonDegreeLarge();
-						double tmpr = shapeDetectors[x].back().extractRatioMSTDegreeLarge();
-						double tmps = shapeDetectors[x].back().extractRatioSkeletonAreaLarge();
-						double tmpt = shapeDetectors[x].back().extractRatioCircleAreaHullArea();
-						double tmpu = shapeDetectors[x].back().extractRatioHullLengthSkeletonLength();
-						double tmpv = shapeDetectors[x].back().extractRatioMSTLengthSkeletonLength();
-						double tmpw = shapeDetectors[x].back().extractRatioAreaOfFirstCircleAndAverageAreaOfSkeleton();
-						double tmpx = shapeDetectors[x].back().extractRatioDegreeOfFirstCircleAndAverageDegreeOfSkeleton();
+						double tmpa = shapeDetectors[x].back().extractAreaOfCircles();//1
+						double tmpb = shapeDetectors[x].back().extractAreaOfBoundRect();//2
+						double tmpc = shapeDetectors[x].back().extractAreaOfBoundHull();//3
+						double tmpd = shapeDetectors[x].back().extractHullLength();//4
+						double tmpe = shapeDetectors[x].back().extractSkeletonLength();//5
+						double tmpf = shapeDetectors[x].back().extractAverageDegreeOfSkeleton();//6
+						double tmpg = shapeDetectors[x].back().extractAverageAngleOfSkeleton();//7
+						double tmph = shapeDetectors[x].back().extractAreaOfFirstCircle();//8
+						double tmpi = shapeDetectors[x].back().extractDegreeOfFirstCircle();//9
+						double tmpj = shapeDetectors[x].back().extractNumberOfSkeletonNodes();//10
+						double tmpk = shapeDetectors[x].back().extractNumberOfHullNodes();//11
+						double tmpl = shapeDetectors[x].back().extractNumberOfMSTNodes();//12
+						double tmpm = shapeDetectors[x].back().extractMSTLength();//13
+						double tmpn = shapeDetectors[x].back().extractAverageAreaOfCircles();//14
+						double tmpo = shapeDetectors[x].back().extractAverageAngleOfMST();//15
+						double tmpp = shapeDetectors[x].back().extractAverageAngleOfHull();//16
+						double tmpq = shapeDetectors[x].back().extractRatioSkeletonDegreeLarge();//17
+						double tmpr = shapeDetectors[x].back().extractRatioMSTDegreeLarge();//18
+						double tmps = shapeDetectors[x].back().extractRatioSkeletonAreaLarge();//19
+						double tmpt = shapeDetectors[x].back().extractRatioCircleAreaHullArea();//20
+						double tmpu = shapeDetectors[x].back().extractRatioHullLengthSkeletonLength();//21
+						double tmpv = shapeDetectors[x].back().extractRatioMSTLengthSkeletonLength();//22
+						double tmpw = shapeDetectors[x].back().extractRatioAreaOfFirstCircleAndAverageAreaOfSkeleton();//23
+						double tmpx = shapeDetectors[x].back().extractRatioDegreeOfFirstCircleAndAverageDegreeOfSkeleton();//24
 
 						shapeDetectors[x].back().addFeature(tmpa);
 						shapeDetectors[x].back().addFeature(tmpb);
@@ -101,32 +101,6 @@ int main()
 			}
 		}
 	}
-
-	/*
-	for(unsigned a = 0; a < shapeDetectors.size(); a++){
-		for(unsigned b = 0; b < shapeDetectors[a].size(); b++){
-			cout << "+1";
-			for(unsigned c = 0; c < shapeDetectors[a][b].features.size(); c++){
-
-				cout << " " << c + 1 << ":" << shapeDetectors[a][b].features[c];
-			}
-			if(b < 10)	
-				cout << " # " << "shape" << a + 1 << "-00" << b << endl;
-			else
-				cout << " # " << "shape" << a + 1 << "-0" << b << endl;
-		}
-	}
-	*/
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//exit
-
-	//for(unsigned i = shapeDetectors.size(); i > 0; i--)
-	//{
-	//	for(unsigned j = shapeDetectors[i - 1].size(); j > 0; j--){
-	//		shapeDetectors[i - 1][j - 1].exit();
-	//	}
-	//}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
