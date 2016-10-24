@@ -155,9 +155,10 @@ bool MyFeatureDetector::init(char* imgname, bool flag)
 			imshow("mapped mst", reducedImage);
 			waitKey(0);
 		}
-
+	
+		//just want to see if this works still or not.
 		//attempt to close the shape
-		tools.closeImage(maps,reducedImage);
+		//tools.closeImage(maps,reducedImage);
 		
         //create temp vector
         for(int i = 0; i < (int)pSet.size(); i++)
@@ -259,13 +260,12 @@ Circle MyFeatureDetector::insertCircle(Mat shape, Point seed)
 		jitterAmount +=2;
 	}
 	//bool isInside = tools.isInside(seed,shapes);
-    bool isInside2 = tools.isInside2(seed,shapes);
-    if(isInside2 == false){
-        Circle falseCircle;
-        falseCircle.radius = -1;
-        return falseCircle;
-    }
-
+    //bool isInside2 = tools.isInside2(seed,shapes);
+    //if(isInside2 == false){
+    //    Circle falseCircle;
+    //    falseCircle.radius = -1;
+    //    return falseCircle;
+    //}
     Circle myCircle;
 
     bool largestCircle = false;

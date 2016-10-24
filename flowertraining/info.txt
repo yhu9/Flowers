@@ -25,3 +25,17 @@ Trial 4:
 The reasoning for this method was because using more discluded images than included images caused the classfication test to produced severly wrong results. However, the results for this method proved to be quite high in correctly classifying an image into its respective shape. Although the some shapes were better than others. An important thing to keep in mind is the possibility that the low accuracy rate is not wrong but could be a useful feature. The accuracy ratings are percentages on how wrong the guess was. A negative and possitive value between -1 and 1 show how much the image was discluded or included. Most of the time an included image is highly positive and a discluded image is highly negative. However, during the classification period, sometimes an image that was included would be incorrectly discluded because its features do not fit with the set of included images. It is possible though that an error could just be showing that an image that was thought to be in the included set was not actually supposed to be in the included set. More testing and further analysis needs to be done in order to conclude this possibility using an svm.
 
 Perhaps a good way to check if an svm is capable of finding incorrect classfication of feature sets is by testing the svm on shapes that are unrefutably similar to each other in a way that they can be classified together.
+
+Trial 5:
+
+-1000 images total with 200 in each training set.
+-24 features
+
+Trial 6:
+-1000 images total
+-12 features used for each image
+
+Trial 7:
+-shape 1 + shape n images total
+-24 features used for each image
+

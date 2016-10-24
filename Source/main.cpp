@@ -28,7 +28,7 @@ int main()
 				fname << i; fname << j; fname << ".ppm";
 				string tmp = fname.str();
 				const char* filename = tmp.c_str();
-				if(shapeDetectors[x].back().init((char*)filename, 1) != 0)
+				if(shapeDetectors[x].back().init((char*)filename, 0) != 0)
 				{
 					shapeDetectors[x].back().drawCircle2();
 					if(shapeDetectors[x].back().getCircles().size() > 10){
