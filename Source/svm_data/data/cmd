@@ -1,3 +1,53 @@
+cut -c 4- f1 >> f1.fin
+cut -c 4- f2 >> f2.fin
+cut -c 4- f3 >> f3.fin
+cut -c 4- f4 >> f4.fin
+cut -c 4- f5 >> f5.fin
+cut -c 4- f6 >> f6.fin
+cut -c 4- f7 >> f7.fin
+cut -c 4- f8 >> f8.fin
+cut -c 4- f9 >> f9.fin
+cut -c 5- f10 >> f10.fin
+cut -c 5- f11 >> f11.fin
+cut -c 5- f12 >> f12.fin
+cut -c 5- f13 >> f13.fin
+cut -c 5- f15 >> f14.fin
+cut -c 5- f15 >> f15.fin
+cut -c 5- f16 >> f16.fin
+cut -c 5- f17 >> f17.fin
+cut -c 5- f18 >> f18.fin
+cut -c 5- f19 >> f19.fin
+cut -c 5- f20 >> f20.fin
+cut -c 5- f21 >> f21.fin
+cut -c 5- f22 >> f22.fin
+cut -c 5- f23 >> f23.fin
+cut -c 5- f24 >> f24.fin
+
+cat shape5features | grep " 1:[0-9]*\.*[0-9]*e*+*[[:digit:]]* " -o >> f1
+cat shape5features | grep " 2:[0-9]*\.*[0-9]*e*+*[[:digit:]]* " -o >> f2
+cat shape5features | grep " 3:[0-9]*\.*[0-9]*e*+*[[:digit:]]* " -o >> f3
+cat shape5features | grep " 4:[0-9]*\.*[0-9]*e*+*[[:digit:]]* " -o >> f4
+cat shape5features | grep " 5:[0-9]*\.*[0-9]*e*+*[[:digit:]]* " -o >> f5
+cat shape5features | grep " 6:[0-9]*\.*[0-9]*e*+*[[:digit:]]* " -o >> f6
+cat shape5features | grep " 7:[0-9]*\.*[0-9]*e*+*[[:digit:]]* " -o >> f7
+cat shape5features | grep " 8:[0-9]*\.*[0-9]*e*+*[[:digit:]]* " -o >> f8
+cat shape5features | grep " 9:[0-9]*\.*[0-9]*e*+*[[:digit:]]* " -o >> f9
+cat shape5features | grep " 10:[0-9]*\.*[0-9]*e*+*[[:digit:]]* " -o >> f10
+cat shape5features | grep " 11:[0-9]*\.*[0-9]*e*+*[[:digit:]]* " -o >> f11
+cat shape5features | grep " 12:[0-9]*\.*[0-9]*e*+*[[:digit:]]* " -o >> f12
+cat shape5features | grep " 13:[0-9]*\.*[0-9]*e*+*[[:digit:]]* " -o >> f13
+cat shape5features | grep " 14:[0-9]*\.*[0-9]*e*+*[[:digit:]]* " -o >> f14
+cat shape5features | grep " 15:[0-9]*\.*[0-9]*e*+*[[:digit:]]* " -o >> f15
+cat shape5features | grep " 16:[0-9]*\.*[0-9]*e*+*[[:digit:]]* " -o >> f16
+cat shape5features | grep " 17:[0-9]*\.*[0-9]*e*+*[[:digit:]]* " -o >> f17
+cat shape5features | grep " 18:[0-9]*\.*[0-9]*e*+*[[:digit:]]* " -o >> f18
+cat shape5features | grep " 19:[0-9]*\.*[0-9]*e*+*[[:digit:]]* " -o >> f19
+cat shape5features | grep " 20:[0-9]*\.*[0-9]*e*+*[[:digit:]]* " -o >> f20
+cat shape5features | grep " 21:[0-9]*\.*[0-9]*e*+*[[:digit:]]* " -o >> f21
+cat shape5features | grep " 22:[0-9]*\.*[0-9]*e*+*[[:digit:]]* " -o >> f22
+cat shape5features | grep " 23:[0-9]*\.*[0-9]*e*+*[[:digit:]]* " -o >> f23
+cat shape5features | grep " 24:[0-9]*\.*[0-9]*e*+*[[:digit:]]* " -o >> f24
+
 cat f1 | grep -o "[0-9]\{1,\}\.*[0-9]\{1,\}" >> f1.fin
 cat f2 | grep -o "[0-9]\{1,\}\.*[0-9]\{1,\}" >> f2.fin
 cat f3 | grep -o "[0-9]\{1,\}\.*[0-9]\{1,\}" >> f3.fin
